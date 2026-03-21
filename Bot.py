@@ -598,6 +598,8 @@ def cs(msg):
     bot.reply_to(msg, "CUSTOMER SERVICE\n================\nJam: 08.00-22.00 WIB\nTelegram: @FXT82828\n================\nBot aktif 24 jam!", reply_markup=menu(msg.from_user.id))
 
 bot.delete_webhook()
+
 print("ML Store Bot aktif!")
 print("Ketik /id untuk dapat ID admin!")
-bot.polling(none_stop=True)
+
+bot.infinity_polling()
