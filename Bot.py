@@ -355,7 +355,9 @@ bot.send_photo(
     call.message.chat.id,
     "https://raw.githubusercontent.com/ridwanasad32-arch/Bot.pyy/main/qris.jpg",
     caption="Scan QRIS untuk pembayaran\nID: " + tid
-)        if ADMIN_ID != 0:
+)  
+
+if ADMIN_ID != 0:
             bot.send_message(ADMIN_ID, "Ada pembeli!\nID: " + tid + "\nPembeli: " + nama + "\nAkun: #" + str(akun_id) + "\nHarga: Rp " + str(akun[6]))
     elif call.data.startswith("oke_"):
         tid = call.data.split("_")[1]
