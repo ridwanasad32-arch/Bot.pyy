@@ -6,7 +6,7 @@ import datetime
 import random
 import string
 
-TOKEN = "8692003062:AAEvhY5NpYRwvc-xVDrbfRujDGN_YAa4hAQ"
+TOKEN = "8692003062:AAHsL4GO4yxyROSJxKG6o8XVlDf9GQdGgFM"
 ADMIN_ID = 7879820766
 
 bot = telebot.TeleBot(TOKEN)
