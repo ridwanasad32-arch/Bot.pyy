@@ -353,7 +353,7 @@ def callback(call):
 
 bot.send_photo(
     call.message.chat.id,
-    "LINK_QRIS_KAMU",
+    "https://raw.githubusercontent.com/ridwanasad32-arch/Bot.pyy/main/qris.jpg",
     caption="Scan QRIS untuk pembayaran\nID: " + tid
 )        if ADMIN_ID != 0:
             bot.send_message(ADMIN_ID, "Ada pembeli!\nID: " + tid + "\nPembeli: " + nama + "\nAkun: #" + str(akun_id) + "\nHarga: Rp " + str(akun[6]))
