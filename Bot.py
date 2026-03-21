@@ -335,8 +335,27 @@ def callback(call):
         c.execute("UPDATE akun SET status='pending' WHERE id=%s", (akun_id,))
         conn.commit()
         conn.close()
-        bot.edit_message_text("STRUK ORDER\n================\nID: " + tid + "\nAkun: #" + str(akun_id) + " " + str(akun[3]) + "\nHarga: Rp " + str(akun[6]) + "\n================\nTransfer ke:\nDANA: 085649642594\nBCA: 1234567890\n================\nSetelah transfer ketik:\n/bayar " + tid, call.message.chat.id, call.message.message_id)
-        if ADMIN_ID != 0:
+        bot.edit_message_text(
+    "STRUK ORDER\n================\n"
+    "ID: " + tid + "\n"
+    "Akun: #" + str(akun_id) + " " + str(akun[3]) + "\n"
+    "Harga: Rp " + str(akun[6]) + "\n"
+    "================\n"
+    "Metode Pembayaran:\n"
+    "- DANA: 085649642594\n"
+    "- GOPAY: 085649642594\n"
+    "- QRIS: Scan gambar di bawah\n"
+    "================\n"
+    "Setelah bayar ketik:\n/bayar " + tid,
+    call.message.chat.id,
+    call.message.message_id
+)
+
+bot.send_photo(
+    call.message.chat.id,
+    "LINK_QRIS_KAMU",
+    caption="Scan QRIS untuk pembayaran\nID: " + tid
+)        if ADMIN_ID != 0:
             bot.send_message(ADMIN_ID, "Ada pembeli!\nID: " + tid + "\nPembeli: " + nama + "\nAkun: #" + str(akun_id) + "\nHarga: Rp " + str(akun[6]))
     elif call.data.startswith("oke_"):
         tid = call.data.split("_")[1]
