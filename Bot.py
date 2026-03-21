@@ -356,29 +356,55 @@ bot.send_photo(
     "https://raw.githubusercontent.com/ridwanasad32-arch/Bot.pyy/main/qris.jpg",
     caption="Scan QRIS untuk pembayaran\nID: " + tid
 )  
-
 if ADMIN_ID != 0:
-        bot.send_message(ADMIN_ID, "Ada pembeli!\nID: " + tid + "\nPembeli: " + nama + "\nAkun: #" + str(akun_id) + "\nHarga: Rp " + str(akun[6]))
-    elif call.data.startswith("oke_"):
-        tid = call.data.split("_")[1]
-        conn = db()
-        c = conn.cursor()
-        c.execute("UPDATE trx SET status='selesai' WHERE trx_id=%s", (tid,))
-        conn.commit()
-        conn.close()
-        bot.edit_message_text("Transaksi Selesai!\nID: " + tid + "\nTerima kasih!", call.message.chat.id, call.message.message_id)
-        if ADMIN_ID != 0:
-            bot.send_message(ADMIN_ID, "Transaksi " + tid + " selesai!")
-    elif call.data.startswith("masalah_"):
-        tid = call.data.split("_")[1]
-        conn = db()
-        c = conn.cursor()
-        c.execute("UPDATE trx SET status='dispute' WHERE trx_id=%s", (tid,))
-        conn.commit()
-        conn.close()
-        bot.edit_message_text("Laporan diterima!\nID: " + tid + "\nAdmin investigasi 1x24 jam!", call.message.chat.id, call.message.message_id)
-        if ADMIN_ID != 0:
-            bot.send_message(ADMIN_ID, "DISPUTE!\nTransaksi: " + tid + "\nSegera investigasi!")
+    bot.send_message(
+        ADMIN_ID,
+        "Ada pembeli!\nID: " + tid +
+        "\nPembeli: " + nama +
+        "\nAkun: #" + str(akun_id) +
+        "\nHarga: Rp " + str(akun[6])
+    )
+if call.data.startswith("oke_"):
+
+elif call.data.startswith("oke_"):
+    tid = call.data.split("_")[1]
+
+    conn = db()
+    c = conn.cursor()
+    c.execute("UPDATE trx SET status='selesai' WHERE trx_id=%s", (tid,))
+    conn.commit()
+    conn.close()
+
+    bot.edit_message_text(
+        "Transaksi Selesai!\nID: " + tid + "\nTerima kasih!",
+        call.message.chat.id,
+        call.message.message_id
+    )
+
+    if ADMIN_ID != 0:
+        bot.send_message(ADMIN_ID, "Transaksi " + tid + " selesai!")
+
+
+elif call.data.startswith("masalah_"):
+    tid = call.data.split("_")[1]
+
+    conn = db()
+    c = conn.cursor()
+    c.execute("UPDATE trx SET status='dispute' WHERE trx_id=%s", (tid,))
+    conn.commit()
+    conn.close()
+
+    bot.edit_message_text(
+        "Laporan diterima!\nID: " + tid + "\nAdmin investigasi 1x24 jam!",
+        call.message.chat.id,
+        call.message.message_id
+    )
+
+    if ADMIN_ID != 0:
+        bot.send_message(
+            ADMIN_ID,
+            "DISPUTE!\nTransaksi: " + tid + "\nSegera investigasi!"
+        )
 
 @bot.message_handler(commands=['beli'])
 def beli(msg):
@@ -401,7 +427,7 @@ def beli(msg):
         return
     mk = types.InlineKeyboardMarkup()
     mk.row(types.InlineKeyboardButton("Lanjut Beli", callback_data="beli_" + str(akun_id)), types.InlineKeyboardButton("Batal", callback_data="batal"))
-    bot.reply_to(msg, "DETAIL AKUN ML\n================\nRank  : " + str(akun[3]) + "\nHero  : " + str(akun[4]) + " hero\nSkin  : " + str(akun[5]) + " skin\nHarga : Rp " + str(akun[6]) + "\nInfo  : " + str(akun[7]) + "\n================\nLanjutkan pembelian?", reply_markup=mk)
+    bot.reply_to(msg, "DETAIL AKUN ML\n================\nRank  : " + str(akun[3]) nHero  : " + str(akun[4]) + " hero\nSkin  : " + str(akun[5]) + " skin\nHarga : Rp " + str(akun[6]) + "\nInfo  : " + str(akun[7]) + "\n================\nLanjutkan pembelian?", reply_markup=mk)
 
 @bot.message_handler(commands=['bayar'])
 def bayar(msg):
