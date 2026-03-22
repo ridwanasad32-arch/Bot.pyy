@@ -342,7 +342,7 @@ def callback(call):
             caption="📷 STRUK ORDER\n================\nID: " + tid + "\nAkun: #" + str(akun_id) + " " + str(akun[3]) + "\nHarga: Rp " + str(akun[6]) + "\n================\nTransfer ke:\nDANA: 085649642594\nGoPay: 085649642594\n================\nScan QRIS di atas untuk pembayaran!\n================\nSetelah transfer ketik:\n/bayar " + tid
         )
         if ADMIN_ID != 0:
-        bot.send_message(ADMIN_ID, "Ada pembeli!\nID: " + tid + "\nPembeli: " + nama + "\nAkun: #" + str(akun_id) + "\nHarga: Rp " + str(akun[6]))
+            bot.send_message(ADMIN_ID, "Ada pembeli!\nID: " + tid + "\nPembeli: " + nama + "\nAkun: #" + str(akun_id) + "\nHarga: Rp " + str(akun[6]))
     elif call.data.startswith("beli_")
         if ADMIN_ID != 0:
             bot.send_message(ADMIN_ID, "Ada pembeli!\nID: " + tid + "\nPembeli: " + nama + "\nAkun: #" + str(akun_id) + "\nHarga: Rp " + str(akun[6]))
