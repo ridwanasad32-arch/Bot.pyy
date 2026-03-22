@@ -467,7 +467,7 @@ def verif(msg):
     bot.reply_to(msg, "Akun #" + str(akun_id) + " diverifikasi!")
     if penjual:
         bot.send_message(penjual[0], "Akun kamu #" + str(akun_id) + " sudah di katalog!")
-
+        bot.send_message(CHANNEL_ID, "✅ AKUN TERSEDIA!\n================\nID: #" + str(akun_id) + "\nStatus: Siap Dibeli ✅\nKetik /beli " + str(akun_id) + " untuk membeli!")
 @bot.message_handler(commands=['tolak'])
 def tolak(msg):
     if msg.from_user.id != ADMIN_ID:
