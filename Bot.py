@@ -289,14 +289,6 @@ def step_info(msg):
     mk = types.InlineKeyboardMarkup()
     mk.row(types.InlineKeyboardButton("Submit", callback_data="submit_jual"), types.InlineKeyboardButton("Batal", callback_data="batal_jual"))
     bot.reply_to(msg, "Step 7/7\nKirim foto screenshot akun ML kamu!")
-        "KONFIRMASI AKUN\n================\n"
-        "Rank  : " + rank_full + "\n"
-        "Hero  : " + str(data['hero']) + " hero\n"
-        "Skin  : " + str(data['skin']) + " skin\n"
-        "Harga : Rp " + str(data['harga']) + "\n"
-        "Info  : " + str(data['info']) + "\n"
-        "================\nData sudah benar?",
-        reply_markup=mk)
 
 @bot.callback_query_handler(func=lambda c: True)
 def callback(call):
