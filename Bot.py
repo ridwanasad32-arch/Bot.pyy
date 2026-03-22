@@ -344,6 +344,7 @@ def callback(call):
         )
         if ADMIN_ID != 0:
             bot.send_message(ADMIN_ID, "Ada pembeli!\nID: " + tid + "\nPembeli: " + nama + "\nAkun: #" + str(akun_id) + "\nHarga: Rp " + str(akun[6]))
+            bot.send_message(CHANNEL_ID, "🛒 TRANSAKSI BARU!\n================\nID: " + tid + "\nPembeli: " + nama + "\nAkun: #" + str(akun_id) + "\nHarga: Rp " + str(akun[6]) + "\nStatus: Menunggu Pembayaran ⏳")
     elif call.data.startswith("beli_"):
         if ADMIN_ID != 0:
             bot.send_message(ADMIN_ID, "Ada pembeli!\nID: " + tid + "\nPembeli: " + nama + "\nAkun: #" + str(akun_id) + "\nHarga: Rp " + str(akun[6]))
@@ -357,6 +358,7 @@ def callback(call):
         bot.edit_message_text("Transaksi Selesai!\nID: " + tid + "\nTerima kasih!", call.message.chat.id, call.message.message_id)
         if ADMIN_ID != 0:
             bot.send_message(ADMIN_ID, "Transaksi " + tid + " selesai!")
+            bot.send_message(CHANNEL_ID, "✅ TRANSAKSI SELESAI!\n================\nID: " + tid + "\nStatus: Selesai ✅")
     elif call.data.startswith("masalah_"):
         tid = call.data.split("_")[1]
         conn = db()
@@ -367,6 +369,7 @@ def callback(call):
         bot.edit_message_text("Laporan diterima!\nID: " + tid + "\nAdmin investigasi 1x24 jam!", call.message.chat.id, call.message.message_id)
         if ADMIN_ID != 0:
             bot.send_message(ADMIN_ID, "DISPUTE!\nTransaksi: " + tid + "\nSegera investigasi!")
+            bot.send_message(CHANNEL_ID, "⚠️ TRANSAKSI BERMASALAH!\n================\nID: " + tid + "\nStatus: Dalam Investigasi ⚠️")
 
 @bot.message_handler(commands=['beli'])
 def beli(msg):
