@@ -6,7 +6,7 @@ import datetime
 import random
 import string
 
-TOKEN = "8692003062:AAHsL4GO4yxyROSJxKG6o8XVlDf9GQdGgFM"
+TOKEN = "8692003062:AAH_5mgVhzzD2aL_uMHdoi7yskehejdkaI4"
 ADMIN_ID = 7879820766
 
 bot = telebot.TeleBot(TOKEN)
@@ -335,76 +335,29 @@ def callback(call):
         c.execute("UPDATE akun SET status='pending' WHERE id=%s", (akun_id,))
         conn.commit()
         conn.close()
-        bot.edit_message_text(
-    "STRUK ORDER\n================\n"
-    "ID: " + tid + "\n"
-    "Akun: #" + str(akun_id) + " " + str(akun[3]) + "\n"
-    "Harga: Rp " + str(akun[6]) + "\n"
-    "================\n"
-    "Metode Pembayaran:\n"
-    "- DANA: 085649642594\n"
-    "- GOPAY: 085649642594\n"
-    "- QRIS: Scan gambar di bawah\n"
-    "================\n"
-    "Setelah bayar ketik:\n/bayar " + tid,
-    call.message.chat.id,
-    call.message.message_id
-)
-
-bot.send_photo(
-    call.message.chat.id,
-    "https://raw.githubusercontent.com/ridwanasad32-arch/Bot.pyy/main/qris.jpg",
-    caption="Scan QRIS untuk pembayaran\nID: " + tid
-)  
-if ADMIN_ID != 0:
-    bot.send_message(
-        ADMIN_ID,
-        "Ada pembeli!\nID: " + tid +
-        "\nPembeli: " + nama +
-        "\nAkun: #" + str(akun_id) +
-        "\nHarga: Rp " + str(akun[6])
-    )
-if call.data.startswith("oke_"):
-
-elif call.data.startswith("oke_"):
-    tid = call.data.split("_")[1]
-
-    conn = db()
-    c = conn.cursor()
-    c.execute("UPDATE trx SET status='selesai' WHERE trx_id=%s", (tid,))
-    conn.commit()
-    conn.close()
-
-    bot.edit_message_text(
-        "Transaksi Selesai!\nID: " + tid + "\nTerima kasih!",
-        call.message.chat.id,
-        call.message.message_id
-    )
-
-    if ADMIN_ID != 0:
-        bot.send_message(ADMIN_ID, "Transaksi " + tid + " selesai!")
-
-
-elif call.data.startswith("masalah_"):
-    tid = call.data.split("_")[1]
-
-    conn = db()
-    c = conn.cursor()
-    c.execute("UPDATE trx SET status='dispute' WHERE trx_id=%s", (tid,))
-    conn.commit()
-    conn.close()
-
-    bot.edit_message_text(
-        "Laporan diterima!\nID: " + tid + "\nAdmin investigasi 1x24 jam!",
-        call.message.chat.id,
-        call.message.message_id
-    )
-
-    if ADMIN_ID != 0:
-        bot.send_message(
-            ADMIN_ID,
-            "DISPUTE!\nTransaksi: " + tid + "\nSegera investigasi!"
-        )
+        bot.edit_message_text("STRUK ORDER\n================\nID: " + tid + "\nAkun: #" + str(akun_id) + " " + str(akun[3]) + "\nHarga: Rp " + str(akun[6]) + "\n================\nTransfer ke:\nDANA: 085649642594\nBCA: 1234567890\n================\nSetelah transfer ketik:\n/bayar " + tid, call.message.chat.id, call.message.message_id)
+        if ADMIN_ID != 0:
+            bot.send_message(ADMIN_ID, "Ada pembeli!\nID: " + tid + "\nPembeli: " + nama + "\nAkun: #" + str(akun_id) + "\nHarga: Rp " + str(akun[6]))
+    elif call.data.startswith("oke_"):
+        tid = call.data.split("_")[1]
+        conn = db()
+        c = conn.cursor()
+        c.execute("UPDATE trx SET status='selesai' WHERE trx_id=%s", (tid,))
+        conn.commit()
+        conn.close()
+        bot.edit_message_text("Transaksi Selesai!\nID: " + tid + "\nTerima kasih!", call.message.chat.id, call.message.message_id)
+        if ADMIN_ID != 0:
+            bot.send_message(ADMIN_ID, "Transaksi " + tid + " selesai!")
+    elif call.data.startswith("masalah_"):
+        tid = call.data.split("_")[1]
+        conn = db()
+        c = conn.cursor()
+        c.execute("UPDATE trx SET status='dispute' WHERE trx_id=%s", (tid,))
+        conn.commit()
+        conn.close()
+        bot.edit_message_text("Laporan diterima!\nID: " + tid + "\nAdmin investigasi 1x24 jam!", call.message.chat.id, call.message.message_id)
+        if ADMIN_ID != 0:
+            bot.send_message(ADMIN_ID, "DISPUTE!\nTransaksi: " + tid + "\nSegera investigasi!")
 
 @bot.message_handler(commands=['beli'])
 def beli(msg):
@@ -427,7 +380,7 @@ def beli(msg):
         return
     mk = types.InlineKeyboardMarkup()
     mk.row(types.InlineKeyboardButton("Lanjut Beli", callback_data="beli_" + str(akun_id)), types.InlineKeyboardButton("Batal", callback_data="batal"))
-    bot.reply_to(msg, "DETAIL AKUN ML\n================\nRank  : " + str(akun[3]) nHero  : " + str(akun[4]) + " hero\nSkin  : " + str(akun[5]) + " skin\nHarga : Rp " + str(akun[6]) + "\nInfo  : " + str(akun[7]) + "\n================\nLanjutkan pembelian?", reply_markup=mk)
+    bot.reply_to(msg, "DETAIL AKUN ML\n================\nRank  : " + str(akun[3]) + "\nHero  : " + str(akun[4]) + " hero\nSkin  : " + str(akun[5]) + " skin\nHarga : Rp " + str(akun[6]) + "\nInfo  : " + str(akun[7]) + "\n================\nLanjutkan pembelian?", reply_markup=mk)
 
 @bot.message_handler(commands=['bayar'])
 def bayar(msg):
@@ -624,8 +577,6 @@ def cs(msg):
     bot.reply_to(msg, "CUSTOMER SERVICE\n================\nJam: 08.00-22.00 WIB\nTelegram: @FXT82828\n================\nBot aktif 24 jam!", reply_markup=menu(msg.from_user.id))
 
 bot.delete_webhook()
-
 print("ML Store Bot aktif!")
 print("Ketik /id untuk dapat ID admin!")
-
-bot.infinity_polling()
+bot.polling(none_stop=True)
