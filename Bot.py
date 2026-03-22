@@ -313,6 +313,7 @@ def callback(call):
         bot.edit_message_text("Akun disubmit!\nMenunggu verifikasi\nID: #" + str(akun_id), call.message.chat.id, call.message.message_id)
         if ADMIN_ID != 0:
             bot.send_message(ADMIN_ID, "Akun baru!\nID: #" + str(akun_id) + "\nPenjual: " + nama + "\nRank: " + rank_full + "\nHero: " + str(data['hero']) + "\nSkin: " + str(data['skin']) + "\nHarga: Rp " + str(data['harga']) + "\n/verif " + str(akun_id) + "\n/tolak " + str(akun_id))
+            bot.send_message(CHANNEL_ID, "🆕 AKUN BARU MASUK!\n================\nID: #" + str(akun_id) + "\nPenjual: " + nama + "\nRank: " + rank_full + "\nHarga: Rp " + str(data['harga']) + "\nStatus: Menunggu Verifikasi Admin ⏳")
         bot.send_message(uid, "Kembali ke menu!", reply_markup=menu(uid))
     elif call.data == "batal_jual":
         state.pop(uid, None)
@@ -486,6 +487,7 @@ def tolak(msg):
     bot.reply_to(msg, "Akun #" + str(akun_id) + " ditolak!")
     if penjual:
         bot.send_message(penjual[0], "Akun kamu #" + str(akun_id) + " ditolak!")
+        bot.send_message(CHANNEL_ID, "✅ AKUN TERSEDIA!\n================\nID: #" + str(akun_id) + "\nStatus: Siap Dibeli ✅\nKetik /beli " + str(akun_id) + " untuk membeli!")
 
 @bot.message_handler(commands=['konfirm'])
 def konfirm(msg):
