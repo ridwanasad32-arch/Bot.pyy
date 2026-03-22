@@ -8,6 +8,7 @@ import string
 
 TOKEN = "8692003062:AAH_5mgVhzzD2aL_uMHdoi7yskehejdkaI4"
 ADMIN_ID = 7879820766
+CHANNEL_ID = -1003759028487
 
 bot = telebot.TeleBot(TOKEN)
 
