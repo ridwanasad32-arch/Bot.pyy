@@ -343,7 +343,7 @@ def callback(call):
         )
         if ADMIN_ID != 0:
         bot.send_message(ADMIN_ID, "Ada pembeli!\nID: " + tid + "\nPembeli: " + nama + "\nAkun: #" + str(akun_id) + "\nHarga: Rp " + str(akun[6]))
-    elif call.data.startswith("
+    elif call.data.startswith("beli_")
         if ADMIN_ID != 0:
             bot.send_message(ADMIN_ID, "Ada pembeli!\nID: " + tid + "\nPembeli: " + nama + "\nAkun: #" + str(akun_id) + "\nHarga: Rp " + str(akun[6]))
     elif call.data.startswith("oke_"):
