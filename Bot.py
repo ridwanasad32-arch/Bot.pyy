@@ -23,7 +23,14 @@ def setup():
     c.execute('''CREATE TABLE IF NOT EXISTS banned (id SERIAL PRIMARY KEY, user_id BIGINT, tgl TEXT)''')
     conn.commit()
     conn.close()
-
+    conn2 = db()
+    c2 = conn2.cursor()
+    try:
+        c2.execute("ALTER TABLE akun ADD COLUMN foto TEXT")
+        conn2.commit()
+    except:
+        pass
+    conn2.close()
 setup()
 
 def buat_trx():
@@ -277,11 +284,11 @@ def step_info(msg):
         return
     data = state[msg.from_user.id]
     data['info'] = msg.text
-    data['step'] = 'done'
+    data['step'] = 'foto'
     rank_full = data.get('rank_full', data.get('rank', ''))
     mk = types.InlineKeyboardMarkup()
     mk.row(types.InlineKeyboardButton("Submit", callback_data="submit_jual"), types.InlineKeyboardButton("Batal", callback_data="batal_jual"))
-    bot.reply_to(msg,
+    bot.reply_to(msg, "Step 7/7\nKirim foto screenshot akun ML kamu!")
         "KONFIRMASI AKUN\n================\n"
         "Rank  : " + rank_full + "\n"
         "Hero  : " + str(data['hero']) + " hero\n"
@@ -589,7 +596,20 @@ def testimoni(msg):
 @bot.message_handler(func=lambda m: m.text == "CS")
 def cs(msg):
     bot.reply_to(msg, "CUSTOMER SERVICE\n================\nJam: 08.00-22.00 WIB\nTelegram: @FXT82828\n================\nBot aktif 24 jam!", reply_markup=menu(msg.from_user.id))
-
+@bot.message_handler(content_types=['photo'], func=lambda m: m.from_user.id in state and state[m.from_user.id].get('step') == 'foto')
+def step_foto(msg):
+    if msg.text == "Batal":
+        state.pop(msg.from_user.id, None)
+        bot.reply_to(msg, "Dibatalkan!", reply_markup=menu(msg.from_user.id))
+        return
+    foto_id = msg.photo[-1].file_id
+    state[msg.from_user.id]['foto'] = foto_id
+    state[msg.from_user.id]['step'] = 'done'
+    data = state[msg.from_user.id]
+    rank_full = data.get('rank_full', data.get('rank', ''))
+    mk = types.InlineKeyboardMarkup()
+    mk.row(types.InlineKeyboardButton("Submit", callback_data="submit_jual"), types.InlineKeyboardButton("Batal", callback_data="batal"))
+    bot.reply_to(msg, "KONFIRMASI AKUN\n================\nRank : " + rank_full + "\nHero : " + str(data['hero']) + " hero\nSkin : " + str(data['skin']) + " skin\nHarga : Rp " + str(data['harga']) + "\nInfo  : " + str(data['info']) + "\n================\nData sudah benar?", reply_markup=mk)
 bot.delete_webhook()
 print("ML Store Bot aktif!")
 print("Ketik /id untuk dapat ID admin!")
