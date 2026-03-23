@@ -461,11 +461,19 @@ def verif(msg):
     c.execute("UPDATE akun SET status='tersedia' WHERE id=%s", (akun_id,))
     c.execute("SELECT penjual_id FROM akun WHERE id=%s", (akun_id,))
     penjual = c.fetchone()
+    conn3 = db()
+    c3 = conn3.cursor()
+    c3.execute("SELECT * FROM akun WHERE id=%s", (akun_id,))
+    akun = c3.fetchone()
+    conn3.close()
     conn.commit()
     conn.close()
     bot.reply_to(msg, "Akun #" + str(akun_id) + " diverifikasi!")
     if penjual:
         bot.send_message(penjual[0], "Akun kamu #" + str(akun_id) + " sudah di katalog!")
+    if akun[10]:
+        bot.send_photo(CHANNEL_ID, akun[10], caption="✅ AKUN TERSEDIA!\n================\nID: #" + str(akun_id) + "\nStatus: Siap Dibeli ✅\nKetik /beli " + str(akun_id) + " untuk membeli!")
+    else:
         bot.send_message(CHANNEL_ID, "✅ AKUN TERSEDIA!\n================\nID: #" + str(akun_id) + "\nStatus: Siap Dibeli ✅\nKetik /beli " + str(akun_id) + " untuk membeli!")
 @bot.message_handler(commands=['tolak'])
 def tolak(msg):
@@ -481,12 +489,11 @@ def tolak(msg):
     c.execute("UPDATE akun SET status='ditolak' WHERE id=%s", (akun_id,))
     c.execute("SELECT penjual_id FROM akun WHERE id=%s", (akun_id,))
     penjual = c.fetchone()
-    conn.commit()
+    bot.send_message(CHANNEL_ID, "❌ AKUN DITOLAK!\n================\nID: #" + str(akun_id) + "\nStatus: Ditolak Admin ❌")
     conn.close()
     bot.reply_to(msg, "Akun #" + str(akun_id) + " ditolak!")
     if penjual:
         bot.send_message(penjual[0], "Akun kamu #" + str(akun_id) + " ditolak!")
-        bot.send_message(CHANNEL_ID, "✅ AKUN TERSEDIA!\n================\nID: #" + str(akun_id) + "\nStatus: Siap Dibeli ✅\nKetik /beli " + str(akun_id) + " untuk membeli!")
 
 @bot.message_handler(commands=['konfirm'])
 def konfirm(msg):
