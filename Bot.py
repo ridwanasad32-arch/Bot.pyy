@@ -303,7 +303,6 @@ def callback(call):
         tgl = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
         conn = db()
         c = conn.cursor()
-        c.execute("INSERT INTO akun (penjual_id,penjual_nama,rank,hero,skin,harga,info,status,tgl) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)", (uid, nama, rank_full, data['hero'], data['skin'], data['harga'], data['info'], 'menunggu_verifikasi', tgl))
         foto_id = data.get('foto', None)
         c.execute("INSERT INTO akun (penjual_id,penjual_nama,rank,hero,skin,harga,info,status,tgl,foto) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)", (uid, nama, rank_full, data['hero'], data['skin'], data['harga'], data['info'], 'menunggu_verifikasi', tgl, foto_id))
         c.execute("SELECT lastval()")
