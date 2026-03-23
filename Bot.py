@@ -313,7 +313,7 @@ def callback(call):
         state.pop(uid, None)
 if foto_id:
         bot.send_photo(ADMIN_ID, foto_id, caption="Akun baru!\nID: #" + str(akun_id) + "\nPenjual: " + nama + "\nRank: " + rank_full + "\n/verif " + str(akun_id) + "\n/tolak " + str(akun_id))
-    else:
+        else:
         bot.send_message(ADMIN_ID, "Akun baru!\nID: #" + str(akun_id) + "\nPenjual: " + nama + "\nRank: " + rank_full + "\n/verif " + str(akun_id) + "\n/tolak " + str(akun_id))
         bot.send_message(CHANNEL_ID, "🆕 AKUN BARU MASUK!\n================\nID: #" + str(akun_id) + "\nPenjual: " + nama + "\nRank: " + rank_full + "\nHarga: Rp " + str(data['harga']) + "\nStatus: Menunggu Verifikasi Admin ⏳")
         bot.send_message(uid, "Kembali ke menu!", reply_markup=menu(uid))
