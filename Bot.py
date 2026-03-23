@@ -616,6 +616,8 @@ def step_foto(msg):
     mk.row(types.InlineKeyboardButton("Submit", callback_data="submit_jual"), types.InlineKeyboardButton("Batal", callback_data="batal"))
     bot.reply_to(msg, "KONFIRMASI AKUN\n================\nRank : " + rank_full + "\nHero : " + str(data['hero']) + " hero\nSkin : " + str(data['skin']) + " skin\nHarga : Rp " + str(data['harga']) + "\nInfo  : " + str(data['info']) + "\n================\nData sudah benar?", reply_markup=mk)
 bot.delete_webhook()
+import time
+time.sleep(2)
 print("ML Store Bot aktif!")
 print("Ketik /id untuk dapat ID admin!")
 bot.polling(none_stop=True)
