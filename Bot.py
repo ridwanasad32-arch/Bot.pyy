@@ -304,13 +304,18 @@ def callback(call):
         conn = db()
         c = conn.cursor()
         c.execute("INSERT INTO akun (penjual_id,penjual_nama,rank,hero,skin,harga,info,status,tgl) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)", (uid, nama, rank_full, data['hero'], data['skin'], data['harga'], data['info'], 'menunggu_verifikasi', tgl))
+        foto_id = data.get('foto', None)
+        c.execute("INSERT INTO akun (penjual_id,penjual_nama,rank,hero,skin,harga,info,status,tgl,foto) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)", (uid, nama, rank_full, data['hero'], data['skin'], data['harga'], data['info'], 'menunggu_verifikasi', tgl, foto_id))
         c.execute("SELECT lastval()")
         akun_id = c.fetchone()[0]
         conn.commit()
         conn.close()
         state[uid]['akun_id'] = akun_id
         state.pop(uid, None)
-        bot.edit_message_text("Akun disubmit!\nMenunggu verifikasi\nID: #" + str(akun_id), call.message.chat.id, call.message.message_id)
+    if foto_id:
+        bot.send_photo(ADMIN_ID, foto_id, caption="Akun baru!\nID: #" + str(akun_id) + "\nPenjual: " + nama + "\nRank: " + rank_full + "\n/verif " + str(akun_id) + "\n/tolak " + str(akun_id))
+    else:
+        bot.send_message(ADMIN_ID, "Akun baru!\nID: #" + str(akun_id) + "\nPenjual: " + nama + "\nRank: " + rank_full + "\n/verif " + str(akun_id) + "\n/tolak " + str(akun_id))
         if ADMIN_ID != 0:
             bot.send_message(ADMIN_ID, "Akun baru!\nID: #" + str(akun_id) + "\nPenjual: " + nama + "\nRank: " + rank_full + "\nHero: " + str(data['hero']) + "\nSkin: " + str(data['skin']) + "\nHarga: Rp " + str(data['harga']) + "\n/verif " + str(akun_id) + "\n/tolak " + str(akun_id))
             bot.send_message(CHANNEL_ID, "🆕 AKUN BARU MASUK!\n================\nID: #" + str(akun_id) + "\nPenjual: " + nama + "\nRank: " + rank_full + "\nHarga: Rp " + str(data['harga']) + "\nStatus: Menunggu Verifikasi Admin ⏳")
@@ -606,7 +611,7 @@ def step_foto(msg):
     state[msg.from_user.id]['foto'] = foto_id
     conn = db()
     c = conn.cursor()
-    c.execute("UPDATE akun SET foto=%s WHERE penjual_id=%s AND status='menunggu_verifikasi'", (foto_id, msg.from_user.id))
+    c.execute("UPDATE akun SET foto=%s WHERE id=(SELECT id FROM akun WHERE penjual_id=%s AND status='menunggu_verifikasi' ORDER BY id DESC LIMIT 1)", (foto_id, msg.from_user.id))
     conn.commit()
     conn.close()
     state[msg.from_user.id]['step'] = 'done'
