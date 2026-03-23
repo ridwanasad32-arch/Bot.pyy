@@ -602,7 +602,12 @@ def step_foto(msg):
         bot.reply_to(msg, "Dibatalkan!", reply_markup=menu(msg.from_user.id))
         return
     foto_id = msg.photo[-1].file_id
-    state[msg.from_user.id]['foto'] = foto_id
+    state[msg.from_user.id]['foto'] = foto_id:
+    conn = db()
+    c = conn.cursor()
+    c.execute("UPDATE akun SET foto=%s WHERE penjual_id=%s AND status='menunggu_verifikasi'", (foto_id, msg.from_user.id))
+    conn.commit()
+    conn.close()
     state[msg.from_user.id]['step'] = 'done'
     data = state[msg.from_user.id]
     rank_full = data.get('rank_full', data.get('rank', ''))
