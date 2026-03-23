@@ -308,6 +308,7 @@ def callback(call):
         akun_id = c.fetchone()[0]
         conn.commit()
         conn.close()
+        state[uid]['akun_id'] = akun_id
         state.pop(uid, None)
         bot.edit_message_text("Akun disubmit!\nMenunggu verifikasi\nID: #" + str(akun_id), call.message.chat.id, call.message.message_id)
         if ADMIN_ID != 0:
