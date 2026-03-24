@@ -311,16 +311,16 @@ def callback(call):
         conn.close()
         state[uid]['akun_id'] = akun_id
         state.pop(uid, None)
-if foto_id:
-        bot.send_photo(ADMIN_ID, foto_id, caption="Akun baru!\nID: #" + str(akun_id) + "\nPenjual: " + nama + "\nRank: " + rank_full + "\n/verif " + str(akun_id) + "\n/tolak " + str(akun_id))
-else:
-        bot.send_message(ADMIN_ID, "Akun baru!\nID: #" + str(akun_id) + "\nPenjual: " + nama + "\nRank: " + rank_full + "\n/verif " + str(akun_id) + "\n/tolak " + str(akun_id))
-        bot.send_message(CHANNEL_ID, "🆕 AKUN BARU MASUK!\n================\nID: #" + str(akun_id) + "\nPenjual: " + nama + "\nRank: " + rank_full + "\nHarga: Rp " + str(data['harga']) + "\nStatus: Menunggu Verifikasi Admin ⏳")
-        bot.send_message(uid, "Kembali ke menu!", reply_markup=menu(uid))
+        if foto_id:
+            bot.send_photo(ADMIN_ID, foto_id, caption="Akun baru!\nID: #" + str(akun_id) + "\nPenjual: " + nama + "\nRank: " + rank_full + "\n/verif " + str(akun_id) + "\n/tolak " + str(akun_id))
+        else:
+            bot.send_message(ADMIN_ID, "Akun baru!\nID: #" + str(akun_id) + "\nPenjual: " + nama + "\nRank: " + rank_full + "\n/verif " + str(akun_id) + "\n/tolak " + str(akun_id))
+            bot.send_message(CHANNEL_ID, "🆕 AKUN BARU MASUK!\n================\nID: #" + str(akun_id) + "\nPenjual: " + nama + "\nRank: " + rank_full + "\nHarga: Rp " + str(data['harga']) + "\nStatus: Menunggu Verifikasi Admin ⏳")
+            bot.send_message(uid, "Kembali ke menu!", reply_markup=menu(uid))
         elif call.data == "batal_jual":
         state.pop(uid, None)
-        bot.edit_message_text("Dibatalkan!", call.message.chat.id, call.message.message_id)
-        bot.send_message(uid, "Kembali ke menu!", reply_markup=menu(uid))
+            bot.edit_message_text("Dibatalkan!", call.message.chat.id, call.message.message_id)
+            bot.send_message(uid, "Kembali ke menu!", reply_markup=menu(uid))
         elif call.data.startswith("beli_"):
         akun_id = int(call.data.split("_")[1])
         conn = db()
