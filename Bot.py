@@ -321,7 +321,7 @@ def callback(call):
         state.pop(uid, None)
         bot.edit_message_text("Dibatalkan!", call.message.chat.id, call.message.message_id)
         bot.send_message(uid, "Kembali ke menu!", reply_markup=menu(uid))
-        elif call.data.startswith("beli_"):
+    elif call.data.startswith("beli_"):
         akun_id = int(call.data.split("_")[1])
         conn = db()
         c = conn.cursor()
