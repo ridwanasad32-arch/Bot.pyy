@@ -599,7 +599,8 @@ def testimoni(msg):
 @bot.message_handler(func=lambda m: m.text == "CS")
 def cs(msg):
     bot.reply_to(msg, "CUSTOMER SERVICE\n================\nJam: 08.00-22.00 WIB\nTelegram: @FXT82828\n================\nBot aktif 24 jam!", reply_markup=menu(msg.from_user.id))
-    @bot.message_handler(func=lambda m: m.text == "📢 Info Channel")
+
+@bot.message_handler(func=lambda m: m.text == "📢 Info Channel")
 def info_channel(msg):
     mk = types.InlineKeyboardMarkup()
     mk.row(types.InlineKeyboardButton("📢 Join Channel", url="https://t.me/transasksijbaz"))
@@ -611,6 +612,7 @@ def info_channel(msg):
         "================\n"
         "Klik tombol di bawah!",
         reply_markup=mk
+        )
 @bot.message_handler(content_types=['photo'], func=lambda m: m.from_user.id in state and state[m.from_user.id].get('step') == 'foto')
 def step_foto(msg):
     if msg.text == "Batal":
