@@ -29,8 +29,8 @@ def setup():
             vote TEXT,
             tgl TEXT
         )''')
-        conn.commit()
-        conn.close()
+    conn.commit()
+    conn.close()
     conn.close()
     conn2 = db()
     c2 = conn2.cursor()
