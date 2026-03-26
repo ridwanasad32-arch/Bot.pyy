@@ -29,6 +29,17 @@ def setup():
             vote TEXT,
             tgl TEXT
         )''')
+    c.execute('''CREATE TABLE IF NOT EXISTS users (
+            id SERIAL PRIMARY KEY,
+            user_id BIGINT UNIQUE,
+            nama TEXT,
+            username TEXT,
+            email TEXT,
+            saldo INTEGER DEFAULT 0,
+            poin INTEGER DEFAULT 0,
+            foto TEXT,
+            tgl TEXT
+        )''')
     conn.commit()
     conn.close()
     conn.close()
@@ -634,14 +645,34 @@ def transaksi(msg):
 
 @bot.message_handler(func=lambda m: m.text == "Profil")
 def profil(msg):
+    uid = msg.from_user.id
+    tgl = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
     conn = db()
     c = conn.cursor()
-    c.execute("SELECT COUNT(*) FROM trx WHERE buyer_id=%s AND status='selesai'", (msg.from_user.id,))
+    c.execute("INSERT INTO users (user_id,nama,username,tgl) VALUES (%s,%s,%s,%s) ON CONFLICT (user_id) DO NOTHING",
+        (uid, msg.from_user.first_name, msg.from_user.username, tgl))
+    c.execute("SELECT * FROM users WHERE user_id=%s", (uid,))
+    user = c.fetchone()
+    c.execute("SELECT COUNT(*) FROM trx WHERE buyer_id=%s AND status='selesai'", (uid,))
     beli = c.fetchone()[0]
-    c.execute("SELECT COUNT(*) FROM akun WHERE penjual_id=%s AND status='terjual'", (msg.from_user.id,))
+    c.execute("SELECT COUNT(*) FROM akun WHERE penjual_id=%s AND status='terjual'", (uid,))
     jual = c.fetchone()[0]
+    conn.commit()
     conn.close()
-    bot.reply_to(msg, "PROFIL KAMU\n================\nNama: " + msg.from_user.first_name + "\nID: " + str(msg.from_user.id) + "\n================\nTotal Beli: " + str(beli) + "\nTotal Jual: " + str(jual), reply_markup=menu(msg.from_user.id))
+    saldo = user[6] if user else 0
+    poin = user[7] if user else 0
+    bot.reply_to(msg,
+        "👤 PROFIL KAMU\n"
+        "================\n"
+        "Nama: " + msg.from_user.first_name + "\n"
+        "ID: " + str(uid) + "\n"
+        "================\n"
+        "💰 Saldo: Rp " + str(saldo) + "\n"
+        "⭐ Poin: " + str(poin) + "\n"
+        "================\n"
+        "Total Beli: " + str(beli) + "\n"
+        "Total Jual: " + str(jual),
+        reply_markup=menu(uid))
 
 @bot.message_handler(func=lambda m: m.text == "Testimoni")
 def testimoni(msg):
