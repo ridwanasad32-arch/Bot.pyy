@@ -22,6 +22,15 @@ def setup():
     c.execute('''CREATE TABLE IF NOT EXISTS trx (id SERIAL PRIMARY KEY, trx_id TEXT, buyer_id BIGINT, buyer_nama TEXT, seller_id BIGINT, akun_id INTEGER, harga INTEGER, status TEXT, tgl TEXT)''')
     c.execute('''CREATE TABLE IF NOT EXISTS banned (id SERIAL PRIMARY KEY, user_id BIGINT, tgl TEXT)''')
     conn.commit()
+    c.execute('''CREATE TABLE IF NOT EXISTS votes (
+            id SERIAL PRIMARY KEY,
+            trx_id TEXT,
+            user_id BIGINT,
+            vote TEXT,
+            tgl TEXT
+        )''')
+        conn.commit()
+        conn.close()
     conn.close()
     conn2 = db()
     c2 = conn2.cursor()
@@ -349,6 +358,22 @@ def callback(call):
         if ADMIN_ID != 0:
             bot.send_message(ADMIN_ID, "Ada pembeli!\nID: " + tid + "\nPembeli: " + nama + "\nAkun: #" + str(akun_id) + "\nHarga: Rp " + str(akun[6]))
             bot.send_message(CHANNEL_ID, "🛒 TRANSAKSI BARU!\n================\nID: " + tid + "\nPembeli: " + nama + "\nAkun: #" + str(akun_id) + "\nHarga: Rp " + str(akun[6]) + "\nStatus: Menunggu Pembayaran ⏳")
+            mk_vote = types.InlineKeyboardMarkup()
+        mk_vote.row(
+            types.InlineKeyboardButton("✅ Lanjut", callback_data="vote_lanjut_" + tid),
+            types.InlineKeyboardButton("❌ Batalkan", callback_data="vote_batal_" + tid)
+        )
+        bot.send_message(CHANNEL_ID,
+            "🔔 VOTE TRANSAKSI!\n"
+            "================\n"
+            "ID: " + tid + "\n"
+            "Akun: #" + str(akun_id) + " " + str(akun[3]) + "\n"
+            "Harga: Rp " + str(akun[6]) + "\n"
+            "================\n"
+            "Vote minimal 10 orang dalam 1 jam!\n"
+            "Voter dapat reward 3% dari transaksi!",
+            reply_markup=mk_vote
+        )
     elif call.data.startswith("beli_"):
         if ADMIN_ID != 0:
             bot.send_message(ADMIN_ID, "Ada pembeli!\nID: " + tid + "\nPembeli: " + nama + "\nAkun: #" + str(akun_id) + "\nHarga: Rp " + str(akun[6]))
@@ -612,7 +637,78 @@ def info_channel(msg):
         "================\n"
         "Klik tombol di bawah!",
         reply_markup=mk
-        )
+    )
+@bot.callback_query_handler(func=lambda c: c.data.startswith("vote_"))
+def handle_vote(call):
+    parts = call.data.split("_")
+    vote_type = parts[1]
+    tid = parts[2]
+    uid = call.from_user.id
+    tgl = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+
+    conn = db()
+    c = conn.cursor()
+
+    # Cek sudah vote belum
+    c.execute("SELECT id FROM votes WHERE trx_id=%s AND user_id=%s", (tid, uid))
+    if c.fetchone():
+        bot.answer_callback_query(call.id, "Kamu sudah vote!")
+        conn.close()
+        return
+
+    # Simpan vote
+    c.execute("INSERT INTO votes (trx_id,user_id,vote,tgl) VALUES (%s,%s,%s,%s)",
+        (tid, uid, vote_type, tgl))
+
+    # Hitung vote
+    c.execute("SELECT COUNT(*) FROM votes WHERE trx_id=%s AND vote='lanjut'", (tid,))
+    total_lanjut = c.fetchone()[0]
+    c.execute("SELECT COUNT(*) FROM votes WHERE trx_id=%s AND vote='batal'", (tid,))
+    total_batal = c.fetchone()[0]
+    conn.commit()
+    conn.close()
+
+    bot.answer_callback_query(call.id, "Vote kamu tercatat! ✅")
+
+    # Update tombol dengan jumlah vote
+    mk_update = types.InlineKeyboardMarkup()
+    mk_update.row(
+        types.InlineKeyboardButton("✅ Lanjut (" + str(total_lanjut) + ")", callback_data="vote_lanjut_" + tid),
+        types.InlineKeyboardButton("❌ Batalkan (" + str(total_batal) + ")", callback_data="vote_batal_" + tid)
+    )
+    bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=mk_update)
+
+    # Kalau sudah 10 vote lanjut
+    if total_lanjut >= 10:
+        conn2 = db()
+        c2 = conn2.cursor()
+        c2.execute("SELECT harga FROM trx WHERE trx_id=%s", (tid,))
+        hasil = c2.fetchone()
+        if hasil:
+            harga = hasil[0]
+            reward_total = int(harga * 0.03)
+            reward_per_orang = reward_total // 10
+            c2.execute("SELECT user_id FROM votes WHERE trx_id=%s AND vote='lanjut' LIMIT 10", (tid,))
+            voters = c2.fetchall()
+            for v in voters:
+                try:
+                    bot.send_message(v[0],
+                        "🎉 Transaksi " + tid + " dilanjutkan!\n"
+                        "Reward kamu: Rp " + str(reward_per_orang)
+                    )
+                except:
+                    pass
+        conn2.commit()
+        conn2.close()
+
+        bot.edit_message_text(
+            "✅ TRANSAKSI DILANJUTKAN!\n"
+            "================\n"
+            "ID: " + tid + "\n"
+            "Total Vote: " + str(total_lanjut) + "\n"
+            "Reward dibagi ke 10 voter!",
+            call.message.chat.id, call.message.message_id
+    )
 @bot.message_handler(content_types=['photo'], func=lambda m: m.from_user.id in state and state[m.from_user.id].get('step') == 'foto')
 def step_foto(msg):
     if msg.text == "Batal":
