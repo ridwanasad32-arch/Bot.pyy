@@ -63,6 +63,14 @@ def is_banned(uid):
     r = c.fetchone()
     conn.close()
     return r is not None
+    def tambah_poin(uid, jumlah):
+    conn = db()
+    c = conn.cursor()
+    tgl = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+    c.execute("INSERT INTO users (user_id,poin,tgl) VALUES (%s,%s,%s) ON CONFLICT (user_id) DO UPDATE SET poin = users.poin + %s",
+        (uid, jumlah, tgl, jumlah))
+    conn.commit()
+    conn.close()
 
 def menu(uid):
     m = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -396,6 +404,12 @@ def callback(call):
         conn.commit()
         conn.close()
         bot.edit_message_text("Transaksi Selesai!\nID: " + tid + "\nTerima kasih!", call.message.chat.id, call.message.message_id)
+        bot.edit_message_text("Transaksi Selesai!...  # baris 406
+        tambah_poin(trx[2], 50)  # ← tambah di sini
+        try:
+            bot.send_message(trx[2], "⭐ Kamu dapat 50 poin dari pembelian!")
+        except:
+            pass
         if ADMIN_ID != 0:
             bot.send_message(ADMIN_ID, "Transaksi " + tid + " selesai!")
             bot.send_message(CHANNEL_ID, "✅ TRANSAKSI SELESAI!\n================\nID: " + tid + "\nStatus: Selesai ✅")
@@ -431,6 +445,12 @@ def callback(call):
         conn.commit()
         conn.close()
         bot.answer_callback_query(call.id, "Vote kamu tercatat! ✅")
+        bot.answer_callback_query(call.id, "Vote kamu tercatat! ✅")  # baris 441
+        tambah_poin(uid, 5)  # ← tambah di sini
+        try:
+            bot.send_message(uid, "⭐ Kamu dapat 5 poin dari vote!")
+        except:
+            pass
         mk_update = types.InlineKeyboardMarkup()
         mk_update.row(
             types.InlineKeyboardButton("✅ Lanjut (" + str(total_lanjut) + ")", callback_data="vote_lanjut_" + tid),
@@ -536,6 +556,12 @@ def verif(msg):
     conn.close()
     bot.reply_to(msg, "Akun #" + str(akun_id) + " diverifikasi!")
     if penjual:
+            bot.send_message(penjual[0], "Akun kamu #" + str(akun_id) + " sudah di katalog!")  # baris 558 tetap
+            tambah_poin(penjual[0], 50)  # ← tambah di sini
+            try:
+                bot.send_message(penjual[0], "⭐ Kamu dapat 50 poin karena akun terjual!")
+            except:
+                pass
         bot.send_message(penjual[0], "Akun kamu #" + str(akun_id) + " sudah di katalog!")
     if akun[10]:
         bot.send_photo(CHANNEL_ID, akun[10], caption="✅ AKUN TERSEDIA!\n================\nID: #" + str(akun_id) + "\nStatus: Siap Dibeli ✅\nKetik /beli " + str(akun_id) + " untuk membeli!")
