@@ -399,7 +399,33 @@ def callback(call):
         if ADMIN_ID != 0:
             bot.send_message(ADMIN_ID, "DISPUTE!\nTransaksi: " + tid + "\nSegera investigasi!")
             bot.send_message(CHANNEL_ID, "⚠️ TRANSAKSI BERMASALAH!\n================\nID: " + tid + "\nStatus: Dalam Investigasi ⚠️")
-
+    elif call.data.startswith("vote_"):
+        parts = call.data.split("_")
+        vote_type = parts[1]
+        tid = parts[2]
+        uid = call.from_user.id
+        tgl = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+        conn = db()
+        c = conn.cursor()
+        c.execute("SELECT id FROM votes WHERE trx_id=%s AND user_id=%s", (tid, uid))
+        if c.fetchone():
+            bot.answer_callback_query(call.id, "Kamu sudah vote!")
+            conn.close()
+            return
+        c.execute("INSERT INTO votes (trx_id,user_id,vote,tgl) VALUES (%s,%s,%s,%s)", (tid, uid, vote_type, tgl))
+        c.execute("SELECT COUNT(*) FROM votes WHERE trx_id=%s AND vote='lanjut'", (tid,))
+        total_lanjut = c.fetchone()[0]
+        c.execute("SELECT COUNT(*) FROM votes WHERE trx_id=%s AND vote='batal'", (tid,))
+        total_batal = c.fetchone()[0]
+        conn.commit()
+        conn.close()
+        bot.answer_callback_query(call.id, "Vote kamu tercatat! ✅")
+        mk_update = types.InlineKeyboardMarkup()
+        mk_update.row(
+            types.InlineKeyboardButton("✅ Lanjut (" + str(total_lanjut) + ")", callback_data="vote_lanjut_" + tid),
+            types.InlineKeyboardButton("❌ Batalkan (" + str(total_batal) + ")", callback_data="vote_batal_" + tid)
+        )
+        bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=mk_update)
 @bot.message_handler(commands=['beli'])
 def beli(msg):
     state.pop(msg.from_user.id, None)
