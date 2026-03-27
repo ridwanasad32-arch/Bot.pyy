@@ -47,8 +47,8 @@ def setup():
     c2 = conn2.cursor()
     try:
         c2.execute("ALTER TABLE akun ADD COLUMN foto TEXT")
-        c2.execute("ALTER TABLE users ADD COLUMN referral_by BIGINT")
-        c2.execute("ALTER TABLE users ADD COLUMN kode_referral TEXT")
+        c2.execute("ALTER TABLE users ADD COLUMN refferal_by BIGINT")
+        c2.execute("ALTER TABLE users ADD COLUMN kode_refferal TEXT")
        
         conn2.commit()
     except:
