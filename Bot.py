@@ -517,7 +517,7 @@ def callback(call):
             types.InlineKeyboardButton("❌ Batalkan (" + str(total_batal) + ")", callback_data="vote_batal_" + tid)
         )
         bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=mk_update)
-        elif call.data.startswith("votejual_"):
+    elif call.data.startswith("votejual_"):
         parts = call.data.split("_")
         vote_type = parts[1]
         akun_id = parts[2]
