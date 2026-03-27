@@ -1,11 +1,13 @@
 import telebot
-from telebot import types
+from telebot import apihelper
 import psycopg2
 import os
 import datetime
 import random
 import string
 import os
+
+apihelper.ENABLE_MIDDLEWARE = True 
 
 TOKEN = os.environ.get("BOT_TOKEN")
 ADMIN_ID = 7879820766
