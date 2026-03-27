@@ -773,10 +773,6 @@ def profil(msg):
     conn3.close()
     
     bot.reply_to(msg,
-        "Total Jual: " + str(jual) + "\n"
-        "================\n"
-        "🔗 Referral:\nt.me/@JBAZ_bot?start=" + kode,
-        reply_markup=menu(uid))
         "Nama: " + msg.from_user.first_name + "\n"
         "ID: " + str(uid) + "\n"
         "================\n"
