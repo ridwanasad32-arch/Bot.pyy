@@ -114,17 +114,17 @@ def start(msg):
         c.execute("SELECT id FROM users WHERE user_id=%s", (uid,))
         sudah_ada = c.fetchone()
         if not sudah_ada:
-            # Cari pemilik kode referral
-            c.execute("SELECT user_id FROM users WHERE kode_referral=%s", (kode_ref,))
+            # Cari pemilik kode refferal
+            c.execute("SELECT user_id FROM users WHERE kode_refferal=%s", (kode_ref,))
             pemilik = c.fetchone()
             if pemilik and pemilik[0] != uid:
-                c.execute("INSERT INTO users (user_id,nama,username,referral_by,tgl) VALUES (%s,%s,%s,%s,%s) ON CONFLICT (user_id) DO NOTHING",
+                c.execute("INSERT INTO users (user_id,nama,username,refferal_by,tgl) VALUES (%s,%s,%s,%s,%s) ON CONFLICT (user_id) DO NOTHING",
                     (uid, nama, msg.from_user.username or "", pemilik[0], tgl))
                 conn.commit()
                 conn.close()
                 tambah_poin(pemilik[0], 50)
                 try:
-                    bot.send_message(pemilik[0], "🎉 Teman kamu " + nama + " join lewat referralmu!\n⭐ Kamu dapat 50 poin!")
+                    bot.send_message(pemilik[0], "🎉 Teman kamu " + nama + " join lewat refferalmu!\n⭐ Kamu dapat 50 poin!")
                 except:
                     pass
             else:
