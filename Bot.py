@@ -790,7 +790,7 @@ def profil(msg):
         "Total Beli: " + str(beli) + "\n"
         "Total Jual: " + str(jual) + "\n"
         "================\n"
-        "🔗 Link Refferal:\nt.me/@JBAZ_bot?start=" + kode,
+        "🔗 Link Refferal:\nt.me/JBAZ_bot?start=" + kode,
         reply_markup=menu(uid))
 
 @bot.message_handler(func=lambda m: m.text == "Testimoni")
