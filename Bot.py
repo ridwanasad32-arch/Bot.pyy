@@ -465,9 +465,9 @@ def callback(call):
         conn.commit()
         conn.close()
         bot.edit_message_text("Transaksi Selesai!\nID: " + tid + "\nTerima kasih!", call.message.chat.id, call.message.message_id)
-        tambah_poin(trx[2], 50)  # ← tambah di sini
+        tambah_poin(trx[2], 100)  # ← tambah di sini
         try:
-            bot.send_message(trx[2], "⭐ Kamu dapat 50 poin dari pembelian!")
+            bot.send_message(trx[2], "⭐ Kamu dapat 100 poin dari pembelian!")
         except:
             pass
         if ADMIN_ID != 0:
@@ -786,19 +786,7 @@ def profil(msg):
         "Total Beli: " + str(beli) + "\n"
         "Total Jual: " + str(jual) + "\n"
         "================\n"
-        "🔗 Link Referral:\nt.me/NAMA_BOT?start=" + kode,
-        reply_markup=menu(uid))
-    bot.reply_to(msg,
-        "👤 PROFIL KAMU\n"
-        "================\n"
-        "Nama: " + msg.from_user.first_name + "\n"
-        "ID: " + str(uid) + "\n"
-        "================\n"
-        "💰 Saldo: Rp " + str(saldo) + "\n"
-        "⭐ Poin: " + str(poin) + "\n"
-        "================\n"
-        "Total Beli: " + str(beli) + "\n"
-        "Total Jual: " + str(jual),
+        "🔗 Link Referral:\nt.me/@JBAZ_bot?start=" + kode,
         reply_markup=menu(uid))
 
 @bot.message_handler(func=lambda m: m.text == "Testimoni")
