@@ -47,6 +47,9 @@ def setup():
     c2 = conn2.cursor()
     try:
         c2.execute("ALTER TABLE akun ADD COLUMN foto TEXT")
+        c2.execute("ALTER TABLE users ADD COLUMN referral_by BIGINT")
+        c2.execute("ALTER TABLE users ADD COLUMN kode_referral TEXT")
+       
         conn2.commit()
     except:
         pass
@@ -89,10 +92,42 @@ def start(msg):
     if is_banned(msg.from_user.id):
         bot.reply_to(msg, "Akun dibanned! Hubungi CS.")
         return
+    uid = msg.from_user.id
+    nama = msg.from_user.first_name
+    tgl = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+    
+    # Cek apakah ada kode referral
+    parts = msg.text.split()
+    if len(parts) > 1:
+        kode_ref = parts[1]
+        conn = db()
+        c = conn.cursor()
+        # Cek user sudah pernah join belum
+        c.execute("SELECT id FROM users WHERE user_id=%s", (uid,))
+        sudah_ada = c.fetchone()
+        if not sudah_ada:
+            # Cari pemilik kode referral
+            c.execute("SELECT user_id FROM users WHERE kode_referral=%s", (kode_ref,))
+            pemilik = c.fetchone()
+            if pemilik and pemilik[0] != uid:
+                c.execute("INSERT INTO users (user_id,nama,username,referral_by,tgl) VALUES (%s,%s,%s,%s,%s) ON CONFLICT (user_id) DO NOTHING",
+                    (uid, nama, msg.from_user.username, pemilik[0], tgl))
+                conn.commit()
+                conn.close()
+                tambah_poin(pemilik[0], 50)
+                try:
+                    bot.send_message(pemilik[0], "🎉 Teman kamu " + nama + " join lewat referralmu!\n⭐ Kamu dapat 50 poin!")
+                except:
+                    pass
+            else:
+                conn.close()
+        else:
+            conn.close()
+    
     bot.reply_to(msg,
         "ML ACCOUNT STORE\n"
         "================\n"
-        "Halo " + msg.from_user.first_name + "!\n\n"
+        "Halo " + nama + "!\n\n"
         "- Rekber Otomatis\n"
         "- Garansi 24 Jam\n"
         "- Anti Penipuan\n"
@@ -729,6 +764,31 @@ def profil(msg):
     conn.close()
     saldo = user[6] if user else 0
     poin = user[7] if user else 0
+    kode = "REF" + str(uid)
+    # Simpan kode referral kalau belum ada
+    conn3 = db()
+    c3 = conn3.cursor()
+    c3.execute("UPDATE users SET kode_referral=%s WHERE user_id=%s AND kode_referral IS NULL",
+        (kode, uid))
+    conn3.commit()
+    conn3.close()
+    
+    bot.reply_to(msg,
+        "Total Jual: " + str(jual) + "\n"
+        "================\n"
+        "🔗 Referral:\nt.me/@JBAZ_bot?start=" + kode,
+        reply_markup=menu(uid))
+        "Nama: " + msg.from_user.first_name + "\n"
+        "ID: " + str(uid) + "\n"
+        "================\n"
+        "💰 Saldo: Rp " + str(saldo) + "\n"
+        "⭐ Poin: " + str(poin) + "\n"
+        "================\n"
+        "Total Beli: " + str(beli) + "\n"
+        "Total Jual: " + str(jual) + "\n"
+        "================\n"
+        "🔗 Link Referral:\nt.me/NAMA_BOT?start=" + kode,
+        reply_markup=menu(uid))
     bot.reply_to(msg,
         "👤 PROFIL KAMU\n"
         "================\n"
