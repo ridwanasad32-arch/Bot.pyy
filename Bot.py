@@ -15,7 +15,7 @@ CHANNEL_ID = -1003759028487
 
 bot = telebot.TeleBot(TOKEN)
 @bot.middleware_handler(update_types=['message'])
-def check_bot(bot_instance, call):
+def check_bot(bot_instance, message):
     if call.message.from_user.is_bot:
         bot.reply_to(call.message, "❌ Bot tidak diizinkan!")
         raise Exception("Bot detected")
