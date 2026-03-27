@@ -5,8 +5,9 @@ import os
 import datetime
 import random
 import string
+import os
 
-TOKEN = "8692003062:AAH_5mgVhzzD2aL_uMHdoi7yskehejdkaI4"
+TOKEN = os.environ.get("BOT_TOKEN")
 ADMIN_ID = 7879820766
 CHANNEL_ID = -1003759028487
 
