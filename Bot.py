@@ -11,6 +11,11 @@ ADMIN_ID = 7879820766
 CHANNEL_ID = -1003759028487
 
 bot = telebot.TeleBot(TOKEN)
+@bot.middleware_handler(update_types=['message'])
+def check_bot(bot_instance, call):
+    if call.message.from_user.is_bot:
+        bot.reply_to(call.message, "❌ Bot tidak diizinkan!")
+        raise Exception("Bot detected")
 
 def db():
     return psycopg2.connect(os.environ['DATABASE_URL'])
