@@ -566,7 +566,7 @@ def callback(call):
                 call.message.chat.id, call.message.message_id
             )
             if penjual:
-                bot.send_message(penjual[0], "✅ Akun kamu #"
+                bot.send_message(penjual[0], "✅ Akun kamu #")
 @bot.message_handler(commands=['beli'])
 def beli(msg):
     state.pop(msg.from_user.id, None)
