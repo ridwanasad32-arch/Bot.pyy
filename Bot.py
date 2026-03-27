@@ -327,6 +327,16 @@ def callback(call):
         if uid not in state:
             bot.answer_callback_query(call.id, "Session habis!")
             return
+            conn_cek = db()
+            c_cek = conn_cek.cursor()
+            c_cek.execute("SELECT COUNT(*) FROM akun WHERE penjual_id=%s AND status IN ('menunggu_verifikasi','tersedia','pending')", (uid,))
+            jumlah_akun = c_cek.fetchone()[0]
+            conn_cek.close()
+            if jumlah_akun >= 3:
+                bot.answer_callback_query(call.id, "Maksimal 3 akun aktif!")
+                bot.send_message(uid, "❌ Kamu sudah punya 3 akun aktif!\nTunggu akun terjual dulu sebelum submit lagi.")
+                return
+            
         data = state[uid]
         rank_full = data.get('rank_full', data.get('rank', ''))
         tgl = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
@@ -344,7 +354,23 @@ def callback(call):
             bot.send_photo(ADMIN_ID, foto_id, caption="Akun baru!\nID: #" + str(akun_id) + "\nPenjual: " + nama + "\nRank: " + rank_full + "\n/verif " + str(akun_id) + "\n/tolak " + str(akun_id))
         else:
             bot.send_message(ADMIN_ID, "Akun baru!\nID: #" + str(akun_id) + "\nPenjual: " + nama + "\nRank: " + rank_full + "\n/verif " + str(akun_id) + "\n/tolak " + str(akun_id))
-            bot.send_message(CHANNEL_ID, "🆕 AKUN BARU MASUK!\n================\nID: #" + str(akun_id) + "\nPenjual: " + nama + "\nRank: " + rank_full + "\nHarga: Rp " + str(data['harga']) + "\nStatus: Menunggu Verifikasi Admin ⏳")
+            mk_vote_jual = types.InlineKeyboardMarkup()
+        mk_vote_jual.row(
+            types.InlineKeyboardButton("✅ Layak", callback_data="votejual_layak_" + str(akun_id)),
+            types.InlineKeyboardButton("❌ Tidak Layak", callback_data="votejual_tolak_" + str(akun_id))
+        )
+        bot.send_message(CHANNEL_ID,
+            "🆕 AKUN BARU MASUK!\n"
+            "================\n"
+            "ID: #" + str(akun_id) + "\n"
+            "Penjual: " + nama + "\n"
+            "Rank: " + rank_full + "\n"
+            "Harga: Rp " + str(data['harga']) + "\n"
+            "================\n"
+            "Vote minimal 10 orang!\n"
+            "Voter dapat 5 poin!",
+            reply_markup=mk_vote_jual
+            )
         bot.send_message(uid, "Kembali ke menu!", reply_markup=menu(uid))
     elif call.data == "batal_jual":
         state.pop(uid, None)
@@ -457,6 +483,56 @@ def callback(call):
             types.InlineKeyboardButton("❌ Batalkan (" + str(total_batal) + ")", callback_data="vote_batal_" + tid)
         )
         bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=mk_update)
+        elif call.data.startswith("votejual_"):
+        parts = call.data.split("_")
+        vote_type = parts[1]
+        akun_id = parts[2]
+        uid = call.from_user.id
+        tgl = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+        conn = db()
+        c = conn.cursor()
+        c.execute("SELECT id FROM votes WHERE trx_id=%s AND user_id=%s", ("jual_"+akun_id, uid))
+        if c.fetchone():
+            bot.answer_callback_query(call.id, "Kamu sudah vote!")
+            conn.close()
+            return
+        c.execute("INSERT INTO votes (trx_id,user_id,vote,tgl) VALUES (%s,%s,%s,%s)",
+            ("jual_"+akun_id, uid, vote_type, tgl))
+        c.execute("SELECT COUNT(*) FROM votes WHERE trx_id=%s AND vote='layak'", ("jual_"+akun_id,))
+        total_layak = c.fetchone()[0]
+        c.execute("SELECT COUNT(*) FROM votes WHERE trx_id=%s AND vote='tolak'", ("jual_"+akun_id,))
+        total_tolak = c.fetchone()[0]
+        conn.commit()
+        conn.close()
+        bot.answer_callback_query(call.id, "Vote kamu tercatat! ✅")
+        tambah_poin(uid, 5)
+        try:
+            bot.send_message(uid, "⭐ Kamu dapat 5 poin dari vote akun!")
+        except:
+            pass
+        mk_update = types.InlineKeyboardMarkup()
+        mk_update.row(
+            types.InlineKeyboardButton("✅ Layak (" + str(total_layak) + ")", callback_data="votejual_layak_" + akun_id),
+            types.InlineKeyboardButton("❌ Tidak Layak (" + str(total_tolak) + ")", callback_data="votejual_tolak_" + akun_id)
+        )
+        bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=mk_update)
+        if total_layak >= 10:
+            conn2 = db()
+            c2 = conn2.cursor()
+            c2.execute("UPDATE akun SET status='tersedia' WHERE id=%s", (akun_id,))
+            c2.execute("SELECT penjual_id FROM akun WHERE id=%s", (akun_id,))
+            penjual = c2.fetchone()
+            conn2.commit()
+            conn2.close()
+            bot.edit_message_text(
+                "✅ AKUN DISETUJUI KOMUNITAS!\n"
+                "================\n"
+                "ID: #" + akun_id + "\n"
+                "Sudah masuk katalog!",
+                call.message.chat.id, call.message.message_id
+            )
+            if penjual:
+                bot.send_message(penjual[0], "✅ Akun kamu #"
 @bot.message_handler(commands=['beli'])
 def beli(msg):
     state.pop(msg.from_user.id, None)
@@ -533,40 +609,6 @@ def admin_panel(msg):
     conn.close()
     bot.reply_to(msg, "ADMIN PANEL\n================\nStok: " + str(stok) + "\nPending: " + str(pending) + "\nBayar pending: " + str(bayar_pending) + "\nSelesai: " + str(selesai) + "\n================\n/verif [ID]\n/tolak [ID]\n/konfirm [TRX]\n/kirim [TRX] [detail]\n/ban [ID]")
 
-@bot.message_handler(commands=['verif'])
-def verif(msg):
-    if msg.from_user.id != ADMIN_ID:
-        return
-    try:
-        akun_id = int(msg.text.split()[1])
-    except:
-        bot.reply_to(msg, "Format: /verif [ID]")
-        return
-    conn = db()
-    c = conn.cursor()
-    c.execute("UPDATE akun SET status='tersedia' WHERE id=%s", (akun_id,))
-    c.execute("SELECT penjual_id FROM akun WHERE id=%s", (akun_id,))
-    penjual = c.fetchone()
-    conn3 = db()
-    c3 = conn3.cursor()
-    c3.execute("SELECT * FROM akun WHERE id=%s", (akun_id,))
-    akun = c3.fetchone()
-    conn3.close()
-    conn.commit()
-    conn.close()
-    bot.reply_to(msg, "Akun #" + str(akun_id) + " diverifikasi!")
-    if penjual:
-            bot.send_message(penjual[0], "Akun kamu #" + str(akun_id) + " sudah di katalog!")  # baris 558 tetap
-            tambah_poin(penjual[0], 50)  # ← tambah di sini
-            try:
-                bot.send_message(penjual[0], "⭐ Kamu dapat 50 poin karena akun terjual!")
-            except:
-                pass
-        bot.send_message(penjual[0], "Akun kamu #" + str(akun_id) + " sudah di katalog!")
-    if akun[10]:
-        bot.send_photo(CHANNEL_ID, akun[10], caption="✅ AKUN TERSEDIA!\n================\nID: #" + str(akun_id) + "\nStatus: Siap Dibeli ✅\nKetik /beli " + str(akun_id) + " untuk membeli!")
-    else:
-        bot.send_message(CHANNEL_ID, "✅ AKUN TERSEDIA!\n================\nID: #" + str(akun_id) + "\nStatus: Siap Dibeli ✅\nKetik /beli " + str(akun_id) + " untuk membeli!")
 @bot.message_handler(commands=['tolak'])
 def tolak(msg):
     if msg.from_user.id != ADMIN_ID:
