@@ -65,7 +65,7 @@ def is_banned(uid):
     c.execute("SELECT id FROM banned WHERE user_id=%s", (uid,))
     r = c.fetchone()
     conn.close()
-    return r is not None
+    return is not None
     def tambah_poin(uid, jumlah):
     conn = db()
     c = conn.cursor()
