@@ -1,5 +1,5 @@
 import telebot
-from telebot import apihelper
+from telebot import types, apihelper
 import psycopg2
 import datetime
 import random
