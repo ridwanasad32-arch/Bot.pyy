@@ -119,7 +119,7 @@ def start(msg):
             pemilik = c.fetchone()
             if pemilik and pemilik[0] != uid:
                 c.execute("INSERT INTO users (user_id,nama,username,referral_by,tgl) VALUES (%s,%s,%s,%s,%s) ON CONFLICT (user_id) DO NOTHING",
-                    (uid, nama, msg.from_user.username, pemilik[0], tgl))
+                    (uid, nama, msg.from_user.username or "", pemilik[0], tgl))
                 conn.commit()
                 conn.close()
                 tambah_poin(pemilik[0], 50)
