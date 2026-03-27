@@ -1,7 +1,6 @@
 import telebot
 from telebot import apihelper
 import psycopg2
-import os
 import datetime
 import random
 import string
@@ -17,7 +16,7 @@ bot = telebot.TeleBot(TOKEN)
 @bot.middleware_handler(update_types=['message'])
 def check_bot(bot_instance, message):
     if call.message.from_user.is_bot:
-        bot.reply_to(call.message, "❌ Bot tidak diizinkan!")
+        bot.reply_to(message, "❌ Bot tidak diizinkan!")
         raise Exception("Bot detected")
 
 def db():
