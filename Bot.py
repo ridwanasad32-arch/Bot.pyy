@@ -67,7 +67,7 @@ def is_banned(uid):
     conn.close()
     return r is not None
     def tambah_poin(uid, jumlah):
-    conn = db()
+        conn = db()
     c = conn.cursor()
     tgl = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
     c.execute("INSERT INTO users (user_id,poin,tgl) VALUES (%s,%s,%s) ON CONFLICT (user_id) DO UPDATE SET poin = users.poin + %s",
