@@ -764,10 +764,10 @@ def profil(msg):
     saldo = user[6] if user else 0
     poin = user[7] if user else 0
     kode = "REF" + str(uid)
-    # Simpan kode referral kalau belum ada
+    # Simpan kode refferal kalau belum ada
     conn3 = db()
     c3 = conn3.cursor()
-    c3.execute("UPDATE users SET kode_referral=%s WHERE user_id=%s AND kode_referral IS NULL",
+    c3.execute("UPDATE users SET kode_refferal=%s WHERE user_id=%s AND kode_refferal IS NULL",
         (kode, uid))
     conn3.commit()
     conn3.close()
@@ -782,7 +782,7 @@ def profil(msg):
         "Total Beli: " + str(beli) + "\n"
         "Total Jual: " + str(jual) + "\n"
         "================\n"
-        "🔗 Link Referral:\nt.me/@JBAZ_bot?start=" + kode,
+        "🔗 Link Refferal:\nt.me/@JBAZ_bot?start=" + kode,
         reply_markup=menu(uid))
 
 @bot.message_handler(func=lambda m: m.text == "Testimoni")
