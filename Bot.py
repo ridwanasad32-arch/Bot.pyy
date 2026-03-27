@@ -465,7 +465,6 @@ def callback(call):
         conn.commit()
         conn.close()
         bot.edit_message_text("Transaksi Selesai!\nID: " + tid + "\nTerima kasih!", call.message.chat.id, call.message.message_id)
-        bot.edit_message_text("Transaksi Selesai!...  # baris 406
         tambah_poin(trx[2], 50)  # ← tambah di sini
         try:
             bot.send_message(trx[2], "⭐ Kamu dapat 50 poin dari pembelian!")
