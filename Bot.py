@@ -50,7 +50,6 @@ def setup():
         )''')
     conn.commit()
     conn.close()
-    conn.close()
     conn2 = db()
     c2 = conn2.cursor()
     try:
@@ -74,8 +73,8 @@ def is_banned(uid):
     r = c.fetchone()
     conn.close()
     return r is not None
-    def tambah_poin(uid, jumlah):
-        conn = db()
+def tambah_poin(uid, jumlah):
+    conn = db()
     c = conn.cursor()
     tgl = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
     c.execute("INSERT INTO users (user_id,poin,tgl) VALUES (%s,%s,%s) ON CONFLICT (user_id) DO UPDATE SET poin = users.poin + %s",
@@ -760,7 +759,7 @@ def profil(msg):
     conn = db()
     c = conn.cursor()
     c.execute("INSERT INTO users (user_id,nama,username,tgl) VALUES (%s,%s,%s,%s) ON CONFLICT (user_id) DO NOTHING",
-        (uid, msg.from_user.first_name, msg.from_user.username, tgl))
+        (uid, msg.from_user.first_name, msg.from_user.username or "", tgl))
     c.execute("SELECT * FROM users WHERE user_id=%s", (uid,))
     user = c.fetchone()
     c.execute("SELECT COUNT(*) FROM trx WHERE buyer_id=%s AND status='selesai'", (uid,))
