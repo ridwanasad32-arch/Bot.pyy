@@ -392,11 +392,11 @@ def callback(call):
         conn.close()
         state[uid]['akun_id'] = akun_id
         state.pop(uid, None)
+        mk_vote_jual = types.InlineKeyboardMarkup()
         if foto_id:
             bot.send_photo(ADMIN_ID, foto_id, caption="Akun baru!\nID: #" + str(akun_id) + "\nPenjual: " + nama + "\nRank: " + rank_full + "\n/verif " + str(akun_id) + "\n/tolak " + str(akun_id))
         else:
             bot.send_message(ADMIN_ID, "Akun baru!\nID: #" + str(akun_id) + "\nPenjual: " + nama + "\nRank: " + rank_full + "\n/verif " + str(akun_id) + "\n/tolak " + str(akun_id))
-            mk_vote_jual = types.InlineKeyboardMarkup()
         mk_vote_jual.row(
             types.InlineKeyboardButton("✅ Layak", callback_data="votejual_layak_" + str(akun_id)),
             types.InlineKeyboardButton("❌ Tidak Layak", callback_data="votejual_tolak_" + str(akun_id))
