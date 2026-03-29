@@ -915,7 +915,7 @@ def handle_vote(call):
         "================\n"
         "Bot aman & terpercaya!\n"
         "Coba: t.me/JBAZ_bot")
-except:
+    except:
     pass
 @bot.message_handler(content_types=['photo'], func=lambda m: m.from_user.id in state and state[m.from_user.id].get('step') == 'foto')
 def step_foto(msg):
@@ -936,7 +936,7 @@ def step_foto(msg):
     mk = types.InlineKeyboardMarkup()
     mk.row(types.InlineKeyboardButton("Submit", callback_data="submit_jual"), types.InlineKeyboardButton("Batal", callback_data="batal"))
     bot.reply_to(msg, "KONFIRMASI AKUN\n================\nRank : " + rank_full + "\nHero : " + str(data['hero']) + " hero\nSkin : " + str(data['skin']) + " skin\nHarga : Rp " + str(data['harga']) + "\nInfo  : " + str(data['info']) + "\n================\nData sudah benar?", reply_markup=mk)
-    def cek_voting_expired():
+def cek_voting_expired():
     while True:
         try:
             conn = db()
