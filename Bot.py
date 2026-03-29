@@ -690,7 +690,7 @@ def konfirm(msg):
         conn.close()
         return
     c.execute("UPDATE trx SET status='menunggu_akun' WHERE trx_id=%s", (tid,))
-    try:
+try:
     conn_ch = db()
     c_ch = conn_ch.cursor()
     c_ch.execute("SELECT * FROM akun WHERE id=%s", (akun_id,))
