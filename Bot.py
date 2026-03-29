@@ -768,8 +768,8 @@ def profil(msg):
     jual = c.fetchone()[0]
     conn.commit()
     conn.close()
-    saldo = user[6] if user else 0
-    poin = user[7] if user else 0
+    saldo = user[5] if user else 0
+    poin = user[6] if user else 0
     kode = "REF" + str(uid)
     # Simpan kode refferal kalau belum ada
     conn3 = db()
