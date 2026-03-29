@@ -906,8 +906,8 @@ def handle_vote(call):
             "Reward dibagi ke 10 voter!",
             call.message.chat.id, call.message.message_id
     )
-        try:
-    bot.send_message(CHANNEL_ID,
+    try:
+        bot.send_message(CHANNEL_ID,
         "✅ TRANSAKSI SELESAI!\n"
         "================\n"
         "ID: " + tid + "\n"
