@@ -5,6 +5,8 @@ import datetime
 import random
 import string
 import os
+import threading
+import time
 
 apihelper.ENABLE_MIDDLEWARE = True 
 
@@ -688,6 +690,26 @@ def konfirm(msg):
         conn.close()
         return
     c.execute("UPDATE trx SET status='menunggu_akun' WHERE trx_id=%s", (tid,))
+    try:
+    conn_ch = db()
+    c_ch = conn_ch.cursor()
+    c_ch.execute("SELECT * FROM akun WHERE id=%s", (akun_id,))
+    akun_data = c_ch.fetchone()
+    conn_ch.close()
+    if akun_data:
+        bot.send_message(CHANNEL_ID,
+            "🆕 AKUN BARU DI KATALOG!\n"
+            "================\n"
+            "ID    : #" + str(akun_data[0]) + "\n"
+            "Rank  : " + str(akun_data[3]) + "\n"
+            "Hero  : " + str(akun_data[4]) + " hero\n"
+            "Skin  : " + str(akun_data[5]) + " skin\n"
+            "Harga : Rp " + str(akun_data[6]) + "\n"
+            "================\n"
+            "Beli sekarang!\n"
+            "Ketik /beli " + str(akun_data[0]) + " di @JBAZ_bot")
+except:
+    pass
     conn.commit()
     conn.close()
     bot.reply_to(msg, "Bayar " + tid + " dikonfirmasi!\n/kirim " + tid + " [detail]")
@@ -884,6 +906,17 @@ def handle_vote(call):
             "Reward dibagi ke 10 voter!",
             call.message.chat.id, call.message.message_id
     )
+        try:
+    bot.send_message(CHANNEL_ID,
+        "✅ TRANSAKSI SELESAI!\n"
+        "================\n"
+        "ID: " + tid + "\n"
+        "Total Vote Lanjut: " + str(total_lanjut) + "\n"
+        "================\n"
+        "Bot aman & terpercaya!\n"
+        "Coba: t.me/JBAZ_bot")
+except:
+    pass
 @bot.message_handler(content_types=['photo'], func=lambda m: m.from_user.id in state and state[m.from_user.id].get('step') == 'foto')
 def step_foto(msg):
     if msg.text == "Batal":
@@ -903,6 +936,62 @@ def step_foto(msg):
     mk = types.InlineKeyboardMarkup()
     mk.row(types.InlineKeyboardButton("Submit", callback_data="submit_jual"), types.InlineKeyboardButton("Batal", callback_data="batal"))
     bot.reply_to(msg, "KONFIRMASI AKUN\n================\nRank : " + rank_full + "\nHero : " + str(data['hero']) + " hero\nSkin : " + str(data['skin']) + " skin\nHarga : Rp " + str(data['harga']) + "\nInfo  : " + str(data['info']) + "\n================\nData sudah benar?", reply_markup=mk)
+    def cek_voting_expired():
+    while True:
+        try:
+            conn = db()
+            c = conn.cursor()
+            c.execute("""
+                SELECT DISTINCT v.trx_id, MIN(v.tgl) as mulai
+                FROM votes v
+                LEFT JOIN trx t ON v.trx_id = t.trx_id
+                WHERE t.status = 'voting'
+                GROUP BY v.trx_id
+            """)
+            votings = c.fetchall()
+            now = datetime.datetime.now()
+            for row in votings:
+                tid = row[0]
+                mulai = datetime.datetime.strptime(str(row[1]), "%Y-%m-%d %H:%M")
+                selisih = (now - mulai).total_seconds() / 3600
+                if selisih >= 24:
+                    c.execute("SELECT COUNT(*) FROM votes WHERE trx_id=%s AND vote='lanjut'", (tid,))
+                    lanjut = c.fetchone()[0]
+                    c.execute("SELECT COUNT(*) FROM votes WHERE trx_id=%s AND vote='batal'", (tid,))
+                    batal = c.fetchone()[0]
+                    c.execute("SELECT * FROM trx WHERE trx_id=%s", (tid,))
+                    trx = c.fetchone()
+                    if trx:
+                        if lanjut > batal:
+                            c.execute("UPDATE trx SET status='selesai' WHERE trx_id=%s", (tid,))
+                            pesan = ("⏰ WAKTU VOTING HABIS!\n================\nID: " + tid + "\nHasil: TRANSAKSI DILANJUTKAN!\nVote Lanjut: " + str(lanjut) + "\nVote Batal: " + str(batal))
+                        elif batal > lanjut:
+                            c.execute("UPDATE trx SET status='batal' WHERE trx_id=%s", (tid,))
+                            pesan = ("⏰ WAKTU VOTING HABIS!\n================\nID: " + tid + "\nHasil: TRANSAKSI DIBATALKAN!\nVote Lanjut: " + str(lanjut) + "\nVote Batal: " + str(batal))
+                        else:
+                            c.execute("UPDATE trx SET status='dispute' WHERE trx_id=%s", (tid,))
+                            pesan = ("⏰ WAKTU VOTING HABIS!\n================\nID: " + tid + "\nHasil: SERI! Admin putuskan!\nVote Lanjut: " + str(lanjut) + "\nVote Batal: " + str(batal))
+                        conn.commit()
+                        try:
+                            bot.send_message(trx[2], pesan)
+                        except:
+                            pass
+                        try:
+                            bot.send_message(CHANNEL_ID, pesan)
+                        except:
+                            pass
+                        try:
+                            bot.send_message(ADMIN_ID, pesan)
+                        except:
+                            pass
+            conn.close()
+        except:
+            pass
+        time.sleep(300)
+
+timer = threading.Thread(target=cek_voting_expired)
+timer.daemon = True
+timer.start()
 bot.delete_webhook()
 import time
 time.sleep(2)
