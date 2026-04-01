@@ -1047,6 +1047,54 @@ timer = threading.Thread(target=cek_voting_expired)
 timer.daemon = True
 timer.start()
 @bot.message_handler(func=lambda m: m.from_user.id in state and state[m.from_user.id].get('step') == 'ganti_kredensial')
+@bot.message_handler(commands=['tarik'])
+def tarik(msg):
+    try:
+        jumlah = int(msg.text.split()[1])
+    except:
+        bot.reply_to(msg, "Format: /tarik [jumlah]\nContoh: /tarik 50000")
+        return
+    uid = msg.from_user.id
+    conn = db()
+    c = conn.cursor()
+    c.execute("SELECT saldo FROM users WHERE user_id=%s", (uid,))
+    user = c.fetchone()
+    conn.close()
+    if not user or user[0] < jumlah:
+        bot.reply_to(msg, "❌ Saldo tidak cukup!")
+        return
+    if jumlah < 10000:
+        bot.reply_to(msg, "❌ Minimal tarik Rp 10.000!")
+        return
+    state[uid] = {'step': 'tarik_dana', 'jumlah': jumlah}
+    bot.reply_to(msg, "💰 Tarik Rp " + str(jumlah) + "\nKirim nomor DANA kamu:")
+    @bot.message_handler(func=lambda m: m.from_user.id in state and state[m.from_user.id].get('step') == 'tarik_dana')
+def terima_no_dana(msg):
+    uid = msg.from_user.id
+    no_dana = msg.text.strip()
+    jumlah = state[uid]['jumlah']
+    conn = db()
+    c = conn.cursor()
+    c.execute("UPDATE users SET saldo=saldo-%s WHERE user_id=%s", (jumlah, uid))
+    conn.commit()
+    conn.close()
+    state.pop(uid, None)
+    bot.reply_to(msg, "✅ Request tarik dikirim!\nNomor DANA: " + no_dana + "\nJumlah: Rp " + str(jumlah) + "\nAdmin akan transfer dalam 1x24 jam!")
+    bot.send_message(ADMIN_ID, "💰 REQUEST TARIK!\n================\nUser: " + str(uid) + "\nJumlah: Rp " + str(jumlah) + "\nDANA: " + no_dana + "\n================\nKetik /konfirm_tarik " + str(uid) + " setelah transfer!")
+    @bot.message_handler(commands=['konfirm_tarik'])
+def konfirm_tarik(msg):
+    if msg.from_user.id != ADMIN_ID:
+        return
+    try:
+        target_uid = int(msg.text.split()[1])
+    except:
+        bot.reply_to(msg, "Format: /konfirm_tarik [user_id]")
+        return
+    try:
+        bot.send_message(target_uid, "✅ Saldo kamu sudah ditransfer!\nTerima kasih!")
+    except:
+        pass
+    bot.reply_to(msg, "✅ Konfirmasi tarik berhasil!")
 def terima_kredensial(msg):
     if '|' not in msg.text:
         bot.reply_to(msg, "Format salah! Kirim: username|password")
