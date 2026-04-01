@@ -1112,18 +1112,18 @@ def tarik(msg):
         bot.send_message(ADMIN_ID, "💰 REQUEST TARIK!\n================\nUser: " + str(uid) + "\nJumlah: Rp " + str(jumlah) + "\nDANA: " + no_dana + "\n================\nKetik /konfirm_tarik " + str(uid) + " setelah transfer!")
         @bot.message_handler(commands=['konfirm_tarik'])
         def konfirm_tarik(msg):
-    if msg.from_user.id != ADMIN_ID:
-        return
-    try:
-        target_uid = int(msg.text.split()[1])
-    except:
-        bot.reply_to(msg, "Format: /konfirm_tarik [user_id]")
-        return
-    try:
-        bot.send_message(target_uid, "✅ Saldo kamu sudah ditransfer!\nTerima kasih!")
-    except:
-        pass
-    bot.reply_to(msg, "✅ Konfirmasi tarik berhasil!")
+            if msg.from_user.id != ADMIN_ID:
+                return
+            try:
+                target_uid = int(msg.text.split()[1])
+            except:
+                bot.reply_to(msg, "Format: /konfirm_tarik [user_id]")
+                return
+            try:
+                bot.send_message(target_uid, "✅ Saldo kamu sudah ditransfer!\nTerima kasih!")
+            except:
+                pass
+            bot.reply_to(msg, "✅ Konfirmasi tarik berhasil!")
 def terima_kredensial(msg):
     if '|' not in msg.text:
         bot.reply_to(msg, "Format salah! Kirim: username|password")
