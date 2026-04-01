@@ -690,30 +690,30 @@ def konfirm(msg):
         conn.close()
         return
     c.execute("UPDATE trx SET status='menunggu_akun' WHERE trx_id=%s", (tid,))
-try:
-    conn_ch = db()
-    c_ch = conn_ch.cursor()
-    c_ch.execute("SELECT * FROM akun WHERE id=%s", (akun_id,))
-    akun_data = c_ch.fetchone()
-    conn_ch.close()
-    if akun_data:
-        bot.send_message(CHANNEL_ID,
-            "🆕 AKUN BARU DI KATALOG!\n"
-            "================\n"
-            "ID    : #" + str(akun_data[0]) + "\n"
-            "Rank  : " + str(akun_data[3]) + "\n"
-            "Hero  : " + str(akun_data[4]) + " hero\n"
-            "Skin  : " + str(akun_data[5]) + " skin\n"
-            "Harga : Rp " + str(akun_data[6]) + "\n"
-            "================\n"
-            "Beli sekarang!\n"
-            "Ketik /beli " + str(akun_data[0]) + " di @JBAZ_bot")
-except:
-    pass
-    conn_ch.commit()
-    conn_ch.close()
-    bot.reply_to(msg, "Bayar " + tid + " dikonfirmasi!\n/kirim " + tid + " [detail]")
-    bot.send_message(trx[2], "Pembayaran dikonfirmasi!\nID: " + tid + "\nAkun sedang disiapkan!")
+    try:
+        conn_ch = db()
+        c_ch = conn_ch.cursor()
+        c_ch.execute("SELECT * FROM akun WHERE id=%s", (akun_id,))
+        akun_data = c_ch.fetchone()
+        conn_ch.close()
+        if akun_data:
+            bot.send_message(CHANNEL_ID,
+                "🆕 AKUN BARU DI KATALOG!\n"
+                "================\n"
+                "ID    : #" + str(akun_data[0]) + "\n"
+                "Rank  : " + str(akun_data[3]) + "\n"
+                "Hero  : " + str(akun_data[4]) + " hero\n"
+                "Skin  : " + str(akun_data[5]) + " skin\n"
+                "Harga : Rp " + str(akun_data[6]) + "\n"
+                "================\n"
+                "Beli sekarang!\n"
+                "Ketik /beli " + str(akun_data[0]) + " di @JBAZ_bot")
+    except:
+        pass
+        conn_ch.commit()
+        conn_ch.close()
+        bot.reply_to(msg, "Bayar " + tid + " dikonfirmasi!\n/kirim " + tid + " [detail]")
+        bot.send_message(trx[2], "Pembayaran dikonfirmasi!\nID: " + tid + "\nAkun sedang disiapkan!")
 
 @bot.message_handler(commands=['kirim'])
 def kirim(msg):
