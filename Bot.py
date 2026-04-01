@@ -1098,7 +1098,7 @@ def tarik(msg):
     state[uid] = {'step': 'tarik_dana', 'jumlah': jumlah}
     bot.reply_to(msg, "💰 Tarik Rp " + str(jumlah) + "\nKirim nomor DANA kamu:")
     @bot.message_handler(func=lambda m: m.from_user.id in state and state[m.from_user.id].get('step') == 'tarik_dana')
-def terima_no_dana(msg):
+def no_dana(msg):
     uid = msg.from_user.id
     no_dana = msg.text.strip()
     jumlah = state[uid]['jumlah']
