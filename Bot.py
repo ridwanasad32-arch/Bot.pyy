@@ -1111,35 +1111,35 @@ def tarik(msg):
         bot.reply_to(msg, "✅ Request tarik dikirim!\nNomor DANA: " + no_dana + "\nJumlah: Rp " + str(jumlah) + "\nAdmin akan transfer dalam 1x24 jam!")
         bot.send_message(ADMIN_ID, "💰 REQUEST TARIK!\n================\nUser: " + str(uid) + "\nJumlah: Rp " + str(jumlah) + "\nDANA: " + no_dana + "\n================\nKetik /konfirm_tarik " + str(uid) + " setelah transfer!")
         @bot.message_handler(commands=['konfirm_tarik'])
-    def konfirm_tarik(msg):
-        if msg.from_user.id != ADMIN_ID:
-            return
-        try:
-            target_uid = int(msg.text.split()[1])
-        except:
-            bot.reply_to(msg, "Format: /konfirm_tarik [user_id]")
-            return
-        try:
-            bot.send_message(target_uid, "✅ Saldo kamu sudah ditransfer!\nTerima kasih!")
-        except:
-            pass
-        bot.reply_to(msg, "✅ Konfirmasi tarik berhasil!")
-    def terima_kredensial(msg):
-        if '|' not in msg.text:
-            bot.reply_to(msg, "Format salah! Kirim: username|password")
-            return
-        parts = msg.text.split('|', 1)
-        username_baru = parts[0].strip()
-        password_baru = parts[1].strip()
-        tid = state[msg.from_user.id]['trx_id']
-        conn = db()
-        c = conn.cursor()
-        c.execute("SELECT akun_id, buyer_id FROM trx WHERE trx_id=%s", (tid,))
-        trx = c.fetchone()
-        if trx:
-            c.execute("UPDATE akun SET username_akun=%s, password_akun=%s WHERE id=%s",
-                (username_baru, password_baru, trx[0]))
-            conn.commit()
+def konfirm_tarik(msg):
+    if msg.from_user.id != ADMIN_ID:
+        return
+    try:
+        target_uid = int(msg.text.split()[1])
+    except:
+        bot.reply_to(msg, "Format: /konfirm_tarik [user_id]")
+        return
+    try:
+        bot.send_message(target_uid, "✅ Saldo kamu sudah ditransfer!\nTerima kasih!")
+    except:
+        pass
+    bot.reply_to(msg, "✅ Konfirmasi tarik berhasil!")
+def terima_kredensial(msg):
+    if '|' not in msg.text:
+        bot.reply_to(msg, "Format salah! Kirim: username|password")
+        return
+    parts = msg.text.split('|', 1)
+    username_baru = parts[0].strip()
+    password_baru = parts[1].strip()
+    tid = state[msg.from_user.id]['trx_id']
+    conn = db()
+    c = conn.cursor()
+    c.execute("SELECT akun_id, buyer_id FROM trx WHERE trx_id=%s", (tid,))
+    trx = c.fetchone()
+    if trx:
+        c.execute("UPDATE akun SET username_akun=%s, password_akun=%s WHERE id=%s",
+            (username_baru, password_baru, trx[0]))
+        conn.commit()
         try:
             bot.send_message(trx[1],
                 "🔐 Kredensial akun ML kamu!\n"
