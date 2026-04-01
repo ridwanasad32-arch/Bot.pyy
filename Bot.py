@@ -1111,7 +1111,7 @@ def tarik(msg):
         bot.reply_to(msg, "✅ Request tarik dikirim!\nNomor DANA: " + no_dana + "\nJumlah: Rp " + str(jumlah) + "\nAdmin akan transfer dalam 1x24 jam!")
         bot.send_message(ADMIN_ID, "💰 REQUEST TARIK!\n================\nUser: " + str(uid) + "\nJumlah: Rp " + str(jumlah) + "\nDANA: " + no_dana + "\n================\nKetik /konfirm_tarik " + str(uid) + " setelah transfer!")
         @bot.message_handler(commands=['konfirm_tarik'])
-    def konfirm_tarik(msg):
+def konfirm_tarik(msg):
         if msg.from_user.id != ADMIN_ID:
             return
         try:
