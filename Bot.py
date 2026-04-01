@@ -916,7 +916,7 @@ def handle_vote(call):
         "Bot aman & terpercaya!\n"
         "Coba: t.me/JBAZ_bot")
     except:
-    pass
+        pass
 @bot.message_handler(content_types=['photo'], func=lambda m: m.from_user.id in state and state[m.from_user.id].get('step') == 'foto')
 def step_foto(msg):
     if msg.text == "Batal":
