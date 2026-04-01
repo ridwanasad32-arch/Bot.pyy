@@ -1047,6 +1047,35 @@ timer = threading.Thread(target=cek_voting_expired)
 timer.daemon = True
 timer.start()
 @bot.message_handler(func=lambda m: m.from_user.id in state and state[m.from_user.id].get('step') == 'ganti_kredensial')
+def terima_kredensial(msg):
+    if '|' not in msg.text:
+        bot.reply_to(msg, "Format salah! Kirim: username|password")
+        return
+    parts = msg.text.split('|', 1)
+    username_baru = parts[0].strip()
+    password_baru = parts[1].strip()
+    tid = state[msg.from_user.id]['trx_id']
+    conn = db()
+    c = conn.cursor()
+    c.execute("SELECT akun_id, buyer_id FROM trx WHERE trx_id=%s", (tid,))
+    trx = c.fetchone()
+    if trx:
+        c.execute("UPDATE akun SET username_akun=%s, password_akun=%s WHERE id=%s",
+            (username_baru, password_baru, trx[0]))
+        conn.commit()
+        try:
+            bot.send_message(trx[1],
+                "🔐 Kredensial akun ML kamu!\n"
+                "================\n"
+                "Username: " + username_baru + "\n"
+                "Password: " + password_baru + "\n"
+                "================\n"
+                "Segera login dan ganti password!")
+        except:
+            pass
+    conn.close()
+    state.pop(msg.from_user.id, None)
+    bot.reply_to(msg, "✅ Kredensial berhasil dikirim ke pembeli!")
 @bot.message_handler(commands=['tarik'])
 def tarik(msg):
     try:
