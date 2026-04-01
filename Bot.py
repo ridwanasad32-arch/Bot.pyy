@@ -463,9 +463,6 @@ def callback(call):
             "Voter dapat reward 3% dari transaksi!",
             reply_markup=mk_vote
         )
-    elif call.data.startswith("beli_"):
-        if ADMIN_ID != 0:
-            bot.send_message(ADMIN_ID, "Ada pembeli!\nID: " + tid + "\nPembeli: " + nama + "\nAkun: #" + str(akun_id) + "\nHarga: Rp " + str(akun[6]))
     elif call.data.startswith("oke_"):
         tid = call.data.split("_")[1]
         conn = db()
