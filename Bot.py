@@ -492,6 +492,23 @@ def callback(call):
                 bot.send_message(trx2[0], "🎉 Akun kamu #" + str(trx2[1]) + " sudah terjual!\nTransaksi: " + tid)
             except:
                 pass
+        conn3 = db()
+        c3 = conn3.cursor()
+        c3.execute("SELECT seller_id FROM trx WHERE trx_id=%s", (tid,))
+        seller = c3.fetchone()
+        conn3.close()
+        if seller:
+            state[seller[0]] = {'step': 'ganti_kredensial', 'trx_id': tid}
+            try:
+                bot.send_message(seller[0], 
+                    "🔐 Akun kamu terjual!\n"
+                    "================\n"
+                    "Sekarang ganti username & password akun ML kamu!\n"
+                    "Kirim dalam format:\n"
+                    "username|password\n"
+                    "Contoh: namaakun123|pass456")
+            except:
+                pass
     elif call.data.startswith("masalah_"):
         tid = call.data.split("_")[1]
         conn = db()
@@ -1029,6 +1046,36 @@ timer2.start()
 timer = threading.Thread(target=cek_voting_expired)
 timer.daemon = True
 timer.start()
+@bot.message_handler(func=lambda m: m.from_user.id in state and state[m.from_user.id].get('step') == 'ganti_kredensial')
+def terima_kredensial(msg):
+    if '|' not in msg.text:
+        bot.reply_to(msg, "Format salah! Kirim: username|password")
+        return
+    parts = msg.text.split('|', 1)
+    username_baru = parts[0].strip()
+    password_baru = parts[1].strip()
+    tid = state[msg.from_user.id]['trx_id']
+    conn = db()
+    c = conn.cursor()
+    c.execute("SELECT akun_id, buyer_id FROM trx WHERE trx_id=%s", (tid,))
+    trx = c.fetchone()
+    if trx:
+        c.execute("UPDATE akun SET username_akun=%s, password_akun=%s WHERE id=%s",
+            (username_baru, password_baru, trx[0]))
+        conn.commit()
+        try:
+            bot.send_message(trx[1],
+                "🔐 Kredensial akun ML kamu!\n"
+                "================\n"
+                "Username: " + username_baru + "\n"
+                "Password: " + password_baru + "\n"
+                "================\n"
+                "Segera login dan ganti password!")
+        except:
+            pass
+    conn.close()
+    state.pop(msg.from_user.id, None)
+    bot.reply_to(msg, "✅ Kredensial berhasil dikirim ke pembeli!")
 bot.delete_webhook()
 import time
 time.sleep(2)
