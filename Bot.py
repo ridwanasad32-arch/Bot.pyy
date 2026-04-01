@@ -710,8 +710,9 @@ try:
             "Ketik /beli " + str(akun_data[0]) + " di @JBAZ_bot")
 except:
     pass
-    conn.commit()
-    conn.close()
+
+conn_ch.commit()
+conn_ch.close()
     bot.reply_to(msg, "Bayar " + tid + " dikonfirmasi!\n/kirim " + tid + " [detail]")
     bot.send_message(trx[2], "Pembayaran dikonfirmasi!\nID: " + tid + "\nAkun sedang disiapkan!")
 
