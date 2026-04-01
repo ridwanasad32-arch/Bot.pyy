@@ -1098,19 +1098,19 @@ def tarik(msg):
     state[uid] = {'step': 'tarik_dana', 'jumlah': jumlah}
     bot.reply_to(msg, "💰 Tarik Rp " + str(jumlah) + "\nKirim nomor DANA kamu:")
     @bot.message_handler(func=lambda m: m.from_user.id in state and state[m.from_user.id].get('step') == 'tarik_dana')
-def no_dana(msg):
-    uid = msg.from_user.id
-    no_dana = msg.text.strip()
-    jumlah = state[uid]['jumlah']
-    conn = db()
-    c = conn.cursor()
-    c.execute("UPDATE users SET saldo=saldo-%s WHERE user_id=%s", (jumlah, uid))
-    conn.commit()
-    conn.close()
-    state.pop(uid, None)
-    bot.reply_to(msg, "✅ Request tarik dikirim!\nNomor DANA: " + no_dana + "\nJumlah: Rp " + str(jumlah) + "\nAdmin akan transfer dalam 1x24 jam!")
-    bot.send_message(ADMIN_ID, "💰 REQUEST TARIK!\n================\nUser: " + str(uid) + "\nJumlah: Rp " + str(jumlah) + "\nDANA: " + no_dana + "\n================\nKetik /konfirm_tarik " + str(uid) + " setelah transfer!")
-    @bot.message_handler(commands=['konfirm_tarik'])
+    def terima_no_dana(msg):
+        uid = msg.from_user.id
+        no_dana = msg.text.strip()
+        jumlah = state[uid]['jumlah']
+        conn = db()
+        c = conn.cursor()
+        c.execute("UPDATE users SET saldo=saldo-%s WHERE user_id=%s", (jumlah, uid))
+        conn.commit()
+        conn.close()
+        state.pop(uid, None)
+        bot.reply_to(msg, "✅ Request tarik dikirim!\nNomor DANA: " + no_dana + "\nJumlah: Rp " + str(jumlah) + "\nAdmin akan transfer dalam 1x24 jam!")
+        bot.send_message(ADMIN_ID, "💰 REQUEST TARIK!\n================\nUser: " + str(uid) + "\nJumlah: Rp " + str(jumlah) + "\nDANA: " + no_dana + "\n================\nKetik /konfirm_tarik " + str(uid) + " setelah transfer!")
+        @bot.message_handler(commands=['konfirm_tarik'])
 def konfirm_tarik(msg):
     if msg.from_user.id != ADMIN_ID:
         return
