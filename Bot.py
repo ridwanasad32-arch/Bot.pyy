@@ -998,7 +998,34 @@ def cek_voting_expired():
         except:
             pass
         time.sleep(300)
+def cek_trx_expired():
+    while True:
+        try:
+            conn = db()
+            c = conn.cursor()
+            c.execute("""
+                SELECT trx_id, buyer_id, akun_id FROM trx
+                WHERE status='menunggu_bayar'
+                AND tgl::timestamp < NOW() - INTERVAL '1 hour'
+            """)
+            expired = c.fetchall()
+            for row in expired:
+                tid, buyer_id, akun_id = row
+                c.execute("UPDATE trx SET status='cancelled' WHERE trx_id=%s", (tid,))
+                c.execute("UPDATE akun SET status='tersedia' WHERE id=%s", (akun_id,))
+                try:
+                    bot.send_message(buyer_id, "⏰ Transaksi " + tid + " dibatalkan karena tidak dibayar dalam 1 jam!")
+                except:
+                    pass
+            conn.commit()
+            conn.close()
+        except:
+            pass
+        time.sleep(300)
 
+timer2 = threading.Thread(target=cek_trx_expired)
+timer2.daemon = True
+timer2.start()
 timer = threading.Thread(target=cek_voting_expired)
 timer.daemon = True
 timer.start()
