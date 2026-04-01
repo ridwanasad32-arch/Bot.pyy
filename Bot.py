@@ -482,6 +482,16 @@ def callback(call):
         if ADMIN_ID != 0:
             bot.send_message(ADMIN_ID, "Transaksi " + tid + " selesai!")
             bot.send_message(CHANNEL_ID, "✅ TRANSAKSI SELESAI!\n================\nID: " + tid + "\nStatus: Selesai ✅")
+            conn2 = db()
+        c2 = conn2.cursor()
+        c2.execute("SELECT seller_id, akun_id FROM trx WHERE trx_id=%s", (tid,))
+        trx2 = c2.fetchone()
+        conn2.close()
+        if trx2:
+            try:
+                bot.send_message(trx2[0], "🎉 Akun kamu #" + str(trx2[1]) + " sudah terjual!\nTransaksi: " + tid)
+            except:
+                pass
     elif call.data.startswith("masalah_"):
         tid = call.data.split("_")[1]
         conn = db()
