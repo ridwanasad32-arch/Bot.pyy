@@ -943,10 +943,6 @@ def handle_vote(call):
         pass
 @bot.message_handler(content_types=['photo'], func=lambda m: m.from_user.id in state and state[m.from_user.id].get('step') == 'foto')
 def step_foto(msg):
-    if msg.text == "Batal":
-        state.pop(msg.from_user.id, None)
-        bot.reply_to(msg, "Dibatalkan!", reply_markup=menu(msg.from_user.id))
-        return
     foto_id = msg.photo[-1].file_id
     state[msg.from_user.id]['foto'] = foto_id
     conn = db()
