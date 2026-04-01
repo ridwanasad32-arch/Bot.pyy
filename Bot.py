@@ -360,8 +360,8 @@ def step_info(msg):
     data['step'] = 'foto'
     rank_full = data.get('rank_full', data.get('rank', ''))
     mk = types.InlineKeyboardMarkup()
-    mk.row(types.InlineKeyboardButton("Submit", callback_data="submit_jual"), types.InlineKeyboardButton("Batal", callback_data="batal_jual"))
-    bot.reply_to(msg, "Step 7/7\nKirim foto screenshot akun ML kamu!")
+    mk.row(types.InlineKeyboardButton("❌ Batal", callback_data="batal_foto"))
+    bot.reply_to(msg, "Step 7/7\nKirim foto screenshot akun ML kamu!", reply_markup=mk)
 
 @bot.callback_query_handler(func=lambda c: True)
 def callback(call):
@@ -417,6 +417,10 @@ def callback(call):
             )
         bot.send_message(uid, "Kembali ke menu!", reply_markup=menu(uid))
     elif call.data == "batal_jual":
+        state.pop(uid, None)
+        bot.edit_message_text("Dibatalkan!", call.message.chat.id, call.message.message_id)
+        bot.send_message(uid, "Kembali ke menu!", reply_markup=menu(uid))
+    elif call.data == "batal_foto":
         state.pop(uid, None)
         bot.edit_message_text("Dibatalkan!", call.message.chat.id, call.message.message_id)
         bot.send_message(uid, "Kembali ke menu!", reply_markup=menu(uid))
