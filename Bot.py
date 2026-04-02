@@ -866,18 +866,18 @@ def profil(msg):
         types.InlineKeyboardButton("👥 Info Refferal", callback_data="profil_refferal"),
         types.InlineKeyboardButton("⭐ Riwayat Poin", callback_data="profil_poin")
     )
-bot.reply_to(msg,
-    "Nama: " + msg.from_user.first_name + "\n"
-    "ID: " + str(uid) + "\n"
-    "================\n"
-    "💰 Saldo: Rp " + str(saldo) + "\n"
-    "⭐ Poin: " + str(poin) + "\n"
-    "================\n"
-    "Total Beli: " + str(beli) + "\n"
-    "Total Jual: " + str(jual) + "\n"
-    "================\n"
-    "🔗 Link Refferal:\nt.me/JBAZ_bot?start=" + kode,
-    reply_markup=mk_profil)
+    bot.reply_to(msg,
+        "Nama: " + msg.from_user.first_name + "\n"
+        "ID: " + str(uid) + "\n"
+        "================\n"
+        "💰 Saldo: Rp " + str(saldo) + "\n"
+        "⭐ Poin: " + str(poin) + "\n"
+        "================\n"
+        "Total Beli: " + str(beli) + "\n"
+        "Total Jual: " + str(jual) + "\n"
+        "================\n"
+        "🔗 Link Refferal:\nt.me/JBAZ_bot?start=" + kode,
+        reply_markup=mk_profil)
     
 
 @bot.message_handler(func=lambda m: m.text == "Testimoni")
