@@ -424,6 +424,33 @@ def callback(call):
         state.pop(uid, None)
         bot.edit_message_text("Dibatalkan!", call.message.chat.id, call.message.message_id)
         bot.send_message(uid, "Kembali ke menu!", reply_markup=menu(uid))
+    elif call.data == "profil_tarik":
+        bot.send_message(uid, "Gunakan perintah:\n/tarik [jumlah]\nContoh: /tarik 50000")
+
+    elif call.data == "profil_riwayat":
+        conn = db()
+        c = conn.cursor()
+        c.execute("SELECT * FROM trx WHERE buyer_id=%s ORDER BY id DESC LIMIT 5", (uid,))
+        list_trx = c.fetchall()
+        conn.close()
+        if not list_trx:
+            bot.answer_callback_query(call.id, "Belum ada transaksi!")
+            return
+        teks = "RIWAYAT TRANSAKSI\n================\n\n"
+        for t in list_trx:
+            teks += "ID: " + str(t[1]) + "\nHarga: Rp " + str(t[6]) + "\nStatus: " + str(t[7]) + "\n================\n"
+        bot.send_message(uid, teks)
+
+elif call.data == "profil_refferal":
+    conn = db()
+    c = conn.cursor()
+    c.execute("SELECT COUNT(*) FROM users WHERE refferal_by=%s", (uid,))
+    total_ref = c.fetchone()[0]
+    conn.close()
+    bot.send_message(uid, "INFO REFFERAL\n================\nKode: " + str(uid) + "\nLink: t.me/JBAZ_bot?start=REF" + str(uid) + "\nTotal Refferal: " + str(total_ref) + "\nBonus per refferal: 10 poin")
+
+elif call.data == "profil_poin":
+    bot.send_message(uid, "⭐ RIWAYAT POIN\n================\nPoin kamu: " + str(poin) + "\n================\nCara dapat poin:\n- Vote akun: +5 poin\n- Beli akun: +100 poin\n- Refferal: +10 poin")
     elif call.data.startswith("beli_"):
         akun_id = int(call.data.split("_")[1])
         conn = db()
@@ -829,18 +856,28 @@ def profil(msg):
     conn3.commit()
     conn3.close()
     
-    bot.reply_to(msg,
-        "Nama: " + msg.from_user.first_name + "\n"
-        "ID: " + str(uid) + "\n"
-        "================\n"
-        "💰 Saldo: Rp " + str(saldo) + "\n"
-        "⭐ Poin: " + str(poin) + "\n"
-        "================\n"
-        "Total Beli: " + str(beli) + "\n"
-        "Total Jual: " + str(jual) + "\n"
-        "================\n"
-        "🔗 Link Refferal:\nt.me/JBAZ_bot?start=" + kode,
-        reply_markup=menu(uid))
+    mk_profil = types.InlineKeyboardMarkup()
+mk_profil.row(
+    types.InlineKeyboardButton("💰 Tarik Saldo", callback_data="profil_tarik"),
+    types.InlineKeyboardButton("📋 Riwayat", callback_data="profil_riwayat")
+)
+mk_profil.row(
+    types.InlineKeyboardButton("👥 Info Refferal", callback_data="profil_refferal"),
+    types.InlineKeyboardButton("⭐ Riwayat Poin", callback_data="profil_poin")
+)
+bot.reply_to(msg,
+    "Nama: " + msg.from_user.first_name + "\n"
+    "ID: " + str(uid) + "\n"
+    "================\n"
+    "💰 Saldo: Rp " + str(saldo) + "\n"
+    "⭐ Poin: " + str(poin) + "\n"
+    "================\n"
+    "Total Beli: " + str(beli) + "\n"
+    "Total Jual: " + str(jual) + "\n"
+    "================\n"
+    "🔗 Link Refferal:\nt.me/JBAZ_bot?start=" + kode,
+    reply_markup=mk_profil)
+    
 
 @bot.message_handler(func=lambda m: m.text == "Testimoni")
 def testimoni(msg):
