@@ -441,16 +441,17 @@ def callback(call):
             teks += "ID: " + str(t[1]) + "\nHarga: Rp " + str(t[6]) + "\nStatus: " + str(t[7]) + "\n================\n"
         bot.send_message(uid, teks)
 
-elif call.data == "profil_refferal":
-    conn = db()
-    c = conn.cursor()
-    c.execute("SELECT COUNT(*) FROM users WHERE refferal_by=%s", (uid,))
-    total_ref = c.fetchone()[0]
-    conn.close()
-    bot.send_message(uid, "INFO REFFERAL\n================\nKode: " + str(uid) + "\nLink: t.me/JBAZ_bot?start=REF" + str(uid) + "\nTotal Refferal: " + str(total_ref) + "\nBonus per refferal: 10 poin")
+    elif call.data == "profil_refferal":
+        conn = db()
+        c = conn.cursor()
+        c.execute("SELECT COUNT(*) FROM users WHERE refferal_by=%s", (uid,))
+        total_ref = c.fetchone()[0]
+        conn.close()
+        bot.send_message(uid, "INFO REFFERAL\n================\nKode: " + str(uid) + "\nLink: t.me/JBAZ_bot?start=REF" + str(uid) + "\nTotal Refferal: " + str(total_ref) + "\nBonus per refferal: 10 poin")
 
-elif call.data == "profil_poin":
-    bot.send_message(uid, "⭐ RIWAYAT POIN\n================\nPoin kamu: " + str(poin) + "\n================\nCara dapat poin:\n- Vote akun: +5 poin\n- Beli akun: +100 poin\n- Refferal: +10 poin")
+    elif call.data == "profil_poin":
+        bot.send_message(uid, "⭐ RIWAYAT POIN\n================\nPoin kamu: " + str(poin) + "\n================\nCara dapat poin:\n- Vote akun: +5 poin\n- Beli akun: +100 poin\n- Refferal: +10 poin")
+        
     elif call.data.startswith("beli_"):
         akun_id = int(call.data.split("_")[1])
         conn = db()
