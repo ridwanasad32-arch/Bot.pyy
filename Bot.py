@@ -858,14 +858,14 @@ def profil(msg):
     conn3.close()
     
     mk_profil = types.InlineKeyboardMarkup()
-mk_profil.row(
-    types.InlineKeyboardButton("💰 Tarik Saldo", callback_data="profil_tarik"),
-    types.InlineKeyboardButton("📋 Riwayat", callback_data="profil_riwayat")
-)
-mk_profil.row(
-    types.InlineKeyboardButton("👥 Info Refferal", callback_data="profil_refferal"),
-    types.InlineKeyboardButton("⭐ Riwayat Poin", callback_data="profil_poin")
-)
+    mk_profil.row(
+        types.InlineKeyboardButton("💰 Tarik Saldo", callback_data="profil_tarik"),
+        types.InlineKeyboardButton("📋 Riwayat", callback_data="profil_riwayat")
+    )
+    mk_profil.row(
+        types.InlineKeyboardButton("👥 Info Refferal", callback_data="profil_refferal"),
+        types.InlineKeyboardButton("⭐ Riwayat Poin", callback_data="profil_poin")
+    )
 bot.reply_to(msg,
     "Nama: " + msg.from_user.first_name + "\n"
     "ID: " + str(uid) + "\n"
