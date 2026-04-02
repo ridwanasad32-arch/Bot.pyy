@@ -7,6 +7,7 @@ import string
 import os
 import threading
 import time
+import schedule
 
 apihelper.ENABLE_MIDDLEWARE = True 
 
@@ -1189,6 +1190,40 @@ def terima_kredensial(msg):
     state.pop(msg.from_user.id, None)
     bot.reply_to(msg, "✅ Kredensial berhasil dikirim ke pembeli!")
 bot.delete_webhook()
+def konversi_poin_mingguan():
+    conn = db()
+    c = conn.cursor()
+    c.execute("SELECT user_id, poin FROM users WHERE poin > 0")
+    users = c.fetchall()
+    for user in users:
+        uid = user[0]
+        poin = user[1]
+        saldo_tambah = (poin // 100) * 1000
+        sisa_poin = poin % 100
+        if saldo_tambah > 0:
+            c.execute("UPDATE users SET saldo=saldo+%s, poin=%s WHERE user_id=%s",
+                (saldo_tambah, sisa_poin, uid))
+            try:
+                bot.send_message(uid,
+                    "🔄 KONVERSI POIN MINGGUAN!\n"
+                    "================\n"
+                    "⭐ Poin: " + str(poin) + " → " + str(sisa_poin) + " poin\n"
+                    "💰 Saldo bertambah: Rp " + str(saldo_tambah) + "\n"
+                    "================\n"
+                    "Saldo sekarang bisa ditarik!")
+            except:
+                pass
+    conn.commit()
+    conn.close()
+
+schedule.every().sunday.at("00:00").do(konversi_poin_mingguan)
+
+def run_schedule():
+    while True:
+        schedule.run_pending()
+        time.sleep(30)
+
+threading.Thread(target=run_schedule, daemon=True).start()
 import time
 time.sleep(2)
 print("ML Store Bot aktif!")
